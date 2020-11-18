@@ -1,0 +1,15 @@
+spring:
+  mvc:
+    static-path-pattern: /static/**
+  datasource:
+    url: jdbc:mysql://49.232.157.22:3306/BUAA
+    username: BUAA
+    password: BUAA1821
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  main:
+    allow-bean-definition-overriding: true
+server:
+  port: 8080
