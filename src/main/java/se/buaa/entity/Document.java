@@ -21,8 +21,7 @@ public class Document {
     private int citedQuantity;
     @Column(name = "link")//link
     private String link;
-    @Column(name = "source")
-    private String source;
+
     @Transient  //<-非数据库字段
     private List<Expert> expertList ;
 }

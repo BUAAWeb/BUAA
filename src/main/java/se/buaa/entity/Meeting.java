@@ -8,9 +8,9 @@ import java.util.List;
 @Table(name = "meeting")
 public class Meeting extends Document{
 
-    @Column(name = "date")//会议时间
-    private Date date;
-    @Column(name = "meeting_name",length = 100)//会议名称
-    private String meeting_Name;
+    @Column(name = "time_")//会议时间
+    private Date time_;
+    @Column(name = "origin")
+    private String origin;
 
 }

@@ -9,10 +9,11 @@ import java.util.List;
 @Entity
 @Table(name = "book")
 public class Book extends Document{
-    @Column(name = "date")//出版时间
-    private Date date;
-    @Column(name = "publisher")//出版社
-    private String publisher;
+    @Column(name = "time_")//出版时间
+    private Date time_;
+    @Column(name = "origin")
+    private String origin;
     @Column(name = "isbn")//国际标准书号
     private String isbn;
+
 }
