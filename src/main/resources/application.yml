@@ -1,4 +1,7 @@
 spring:
+  elasticsearch:
+    rest:
+      uris: localhost:9200
   mvc:
     static-path-pattern: /static/**
   datasource:
