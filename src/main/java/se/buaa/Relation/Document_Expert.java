@@ -9,7 +9,7 @@ public class Document_Expert {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "expertID")
-    private int expertID;
+    private String expertID;
     @Column(name = "documentID")
-    private int documentID;
+    private String documentID;
 }

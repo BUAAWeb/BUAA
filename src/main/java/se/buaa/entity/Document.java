@@ -7,8 +7,7 @@ import java.util.List;
 @Table(name = "document")
 public class Document {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private String documentID;
     @Column(name = "title", length = 100)
     private String title;
     @Column(name = "experts", length = 100)
