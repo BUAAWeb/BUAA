@@ -14,5 +14,6 @@ public interface ES_DocumentService {
 
     List<ES_Document> findByTitle(String title);
 
-    List<ES_Document> findByKeywords(List<String> keywords);
+    List<ES_Document> findByKeywords(String keyword);
+    List<ES_Document> findByKeywordsLike(List<String> keywords);
 }

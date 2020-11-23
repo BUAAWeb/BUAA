@@ -38,7 +38,12 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
     }
 
     @Override
-    public List<ES_Document> findByKeywords(List<String> keywords) {
+    public List<ES_Document> findByKeywords(String keyword) {
+        return es_documentDao.findByKeywords(keyword);
+    }
+
+    @Override
+    public List<ES_Document> findByKeywordsLike(List<String> keywords) {
         List<ES_Document> es_documentList = new ArrayList<>();
         for(String keyword : keywords){
             List<ES_Document> es_documentList1 = es_documentDao.findByKeywordsLike(keyword);

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 import se.buaa.Document.ES_Document;
 import se.buaa.Service.ES_DocumentService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/document")
 public class DocumentController {
@@ -17,6 +20,18 @@ public class DocumentController {
     @RequestMapping("findAll")
     public Iterable<ES_Document> findAll() {
         return es_documentService.findAll();
+    }
+
+    @RequestMapping("findByKeywordsLike")
+    public Iterable<ES_Document> findByKeywordsLike(String keywords) {
+        List<String> keyword = new ArrayList<String>();
+        keyword.add(keywords);
+         return es_documentService.findByKeywordsLike(keyword);
+    }
+
+    @RequestMapping("findByKeywords")
+    public Iterable<ES_Document> findByKeywords(String keyword) {
+        return es_documentService.findByKeywords(keyword);
     }
 
 }
