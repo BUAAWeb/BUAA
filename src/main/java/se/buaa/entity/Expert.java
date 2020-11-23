@@ -1,7 +1,7 @@
 package se.buaa.entity;
 
 import se.buaa.Enumeration.Enumeration;
-import se.buaa.Enumeration.Language;
+
 
 import javax.persistence.*;
 import java.util.Date;

@@ -1,7 +1,10 @@
 spring:
   elasticsearch:
-    rest:
-      uris: localhost:9200
+    cluster-name: my-application
+    cluster-nodes: localhost:9300
+    local: yes
+    repositories:
+      enable: true
   mvc:
     static-path-pattern: /static/**
   datasource:
@@ -15,4 +18,4 @@ spring:
   main:
     allow-bean-definition-overriding: true
 server:
-  port: 3306
+  port: 8081
