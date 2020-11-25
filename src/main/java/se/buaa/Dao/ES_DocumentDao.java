@@ -1,7 +1,7 @@
 package se.buaa.Dao;
 
 import org.springframework.data.repository.CrudRepository;
-import se.buaa.Document.ES_Document;
+import se.buaa.Entity.ESDocument.ES_Document;
 
 import java.util.List;
 

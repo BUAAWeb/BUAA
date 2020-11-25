@@ -1,9 +1,9 @@
-package se.buaa.Impl;
+package se.buaa.Service.Impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.buaa.Dao.ES_DocumentDao;
-import se.buaa.Document.ES_Document;
+import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Service.ES_DocumentService;
 
 import java.util.ArrayList;

@@ -1,8 +1,7 @@
-package se.buaa.entity;
+package se.buaa.Entity;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "meeting")

@@ -1,4 +1,4 @@
-package se.buaa.Relation;
+package se.buaa.Entity.Relation;
 
 import javax.persistence.*;
 

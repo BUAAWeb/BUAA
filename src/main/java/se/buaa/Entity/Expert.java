@@ -1,11 +1,7 @@
-package se.buaa.entity;
-
-import se.buaa.Enumeration.Enumeration;
+package se.buaa.Entity;
 
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "expert")

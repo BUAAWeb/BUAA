@@ -1,4 +1,4 @@
-package se.buaa.Document;
+package se.buaa.Entity.ESDocument;
 
 import lombok.Data;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -6,7 +6,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @Document(indexName = "document",indexStoreType = "document")

@@ -1,6 +1,6 @@
 package se.buaa.Service;
 
-import se.buaa.Document.ES_Document;
+import se.buaa.Entity.ESDocument.ES_Document;
 
 import java.util.List;
 
