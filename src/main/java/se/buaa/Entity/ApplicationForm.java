@@ -14,5 +14,6 @@ public class ApplicationForm{
     public int objectID;        //分别对应文献或门户的ID
     public Date time;
     public String result;
+    public String resultInfo;
 
 }

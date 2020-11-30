@@ -3,7 +3,7 @@ package se.buaa.Entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "expert")
+@Table(name = "user")
 public class User {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,5 +14,5 @@ public class User {
         public String email;
         public int isBanned;
         public int isVerified;
-
+        public int isAdmin;
 }
