@@ -15,4 +15,7 @@ public class User {
         public int isBanned;
         public int isVerified;
         public int isAdmin;
+        public String realName;
+        public String phoneNum;
+        public String url;
 }
