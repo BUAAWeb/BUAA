@@ -42,9 +42,9 @@ public class DocumentController {
          return es_documentService.findByKeywordsLike(keyword);
     }
 
-    @RequestMapping("findByKeywords")
-    public Iterable<ES_Document> findByKeywords(String keyword) {
-        return es_documentService.findByKeywords(keyword);
-    }
+//    @RequestMapping("findByKeywords")
+//    public Iterable<ES_Document> findByKeywords(String keyword) {
+//        return es_documentService.findByKeywords(keyword);
+//    }
 
 }

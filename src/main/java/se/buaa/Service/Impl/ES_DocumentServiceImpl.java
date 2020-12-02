@@ -41,6 +41,11 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
     }
 
     @Override
+    public Iterable<ES_Document> findByKeywords(String keyword, PageRequest page) {
+        return null;
+    }
+
+    @Override
     public List<ES_Document> findByKeywords(String keyword) {
         return es_documentDao.findByKeywords(keyword);
     }
