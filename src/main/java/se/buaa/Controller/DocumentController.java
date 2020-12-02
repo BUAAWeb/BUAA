@@ -18,7 +18,6 @@ import java.util.List;
 
 @CrossOrigin(allowCredentials="false")
 @RestController
-//@CrossOrigin(origins = "http:localhost:9200",allowCredentials = "true",maxAge = 3600)
 @RequestMapping("/document")
 public class DocumentController {
     @Autowired
