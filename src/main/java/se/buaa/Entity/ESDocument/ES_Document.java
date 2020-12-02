@@ -21,7 +21,7 @@ public class ES_Document {
     @Field(analyzer = "ik_smart", type = FieldType.Text)//摘要
     private String summary;
     @Field(analyzer = "ik_smart", type = FieldType.Integer)//被引次数
-    private int citedQuantity;
+    private int cited_quantity;
     @Field(analyzer = "ik_smart", type = FieldType.Text)//link
     private String link;
 

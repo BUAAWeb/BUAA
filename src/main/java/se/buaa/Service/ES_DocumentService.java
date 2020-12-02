@@ -1,12 +1,14 @@
 package se.buaa.Service;
 
+import org.springframework.data.domain.PageRequest;
 import se.buaa.Entity.ESDocument.ES_Document;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 
 public interface ES_DocumentService {
-    Iterable<ES_Document> findAll();
+    Iterable<ES_Document> findAll(PageRequest page);
 
     void save(List<ES_Document> documentList);
 
