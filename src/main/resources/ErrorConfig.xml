@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<errors>
+    <scholar code="00">
+        <error code="00" msg="相关学者不存在"
+                classname="se.buaa.Exception.ScholarException"/>
+    </scholar>
+
+    <login code="01">
+        <error code="00" msg="xxx"
+                classname="se.buaa.Exception.LoginException"/>
+    </login>
+</errors>
