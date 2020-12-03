@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.ESDocument.ES_Document;
+import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Response.Result;
 import se.buaa.Repository.ExpertRepository;
@@ -40,7 +42,7 @@ public class AcademicController {
 
 
     @RequestMapping("getHighCited")
-    public Iterable<ES_Document> getHighCited() {
+    public Result<Data> getHighCited() {
         Sort.Order order = Sort.Order.desc("cited_quantity");
         List<Sort.Order> orderList = new ArrayList<>();
 //        orderList.add(order1);
@@ -53,7 +55,9 @@ public class AcademicController {
 //        for(ES_Document es_document : highCitedList){
 //            System.out.println(es_document.getAuthors());
 //        }
-        return highCitedList;
+        Data data = new Data();
+        data.setResult_list(documentsList);
+        return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),data);
 //        if(highCitedList != null)
 //            return new Result<>(200, "success",highCitedList);
 //        else
