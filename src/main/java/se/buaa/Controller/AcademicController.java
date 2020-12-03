@@ -22,12 +22,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.ESDocument.ES_Document;
+import se.buaa.Entity.Expert;
 import se.buaa.Entity.Response.Result;
+import se.buaa.Repository.ExpertRepository;
 import se.buaa.Service.ES_DocumentService;
 
 import java.util.ArrayList;
 import java.util.List;
 
+//@CrossOrigin
 @CrossOrigin(allowCredentials="false")
 @RestController
 @RequestMapping("/academic")
@@ -35,8 +38,9 @@ public class AcademicController {
     @Autowired
     ES_DocumentService es_documentService;
 
+
     @RequestMapping("getHighCited")
-    public Result<Iterable<ES_Document>> getHighCited() {
+    public Iterable<ES_Document> getHighCited() {
         Sort.Order order = Sort.Order.desc("cited_quantity");
         List<Sort.Order> orderList = new ArrayList<>();
 //        orderList.add(order1);
@@ -44,11 +48,16 @@ public class AcademicController {
         Sort sort = Sort.by(orderList);
         PageRequest page = PageRequest.of(0, 10 ,sort);
         Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
-        if(highCitedList != null)
-            return new Result<>(200, "success", highCitedList);
-        else
-            return new Result<>(400,"error",null);
-        return new Result<Iterable<ES_Document>>(200,"success",highCitedList);
+        List<ES_Document> documentsList = new ArrayList<>();
+        highCitedList.forEach(single ->{documentsList.add(single);});
+//        for(ES_Document es_document : highCitedList){
+//            System.out.println(es_document.getAuthors());
+//        }
+        return highCitedList;
+//        if(highCitedList != null)
+//            return new Result<>(200, "success",highCitedList);
+//        else
+//            return new Result<>(400,"error",null);
     }
     @RequestMapping("getSearchResult")
     public Result<SearchResultData> findsearchresult(@RequestParam String kw,//keyword
@@ -71,10 +80,10 @@ public class AcademicController {
             Sort sort = Sort.by(orderList);
             PageRequest page = PageRequest.of(0, 10 ,sort);
             Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
-            List<ES_Document> documentslist = new ArrayList<>();
-            highCitedList.forEach(single ->{documentslist.add(single);});
+            List<ES_Document> documentsList = new ArrayList<>();
+            highCitedList.forEach(single ->{documentsList.add(single);});
             SearchResultData data=new SearchResultData();
-            data.documentList=documentslist;
+            data.documentList=documentsList;
             return new Result<SearchResultData>(200,"success",data);
         }
 

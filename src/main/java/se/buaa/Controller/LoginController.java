@@ -1,17 +1,25 @@
 package se.buaa.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import se.buaa.Entity.Expert;
 import se.buaa.Entity.User;
+import se.buaa.Repository.ExpertRepository;
 import se.buaa.Repository.UserRepository;
 
+@CrossOrigin
 @RestController
 public class LoginController {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ExpertRepository expertRepository;
+
+    @RequestMapping("PostLoad Test")
+    public void test(){
+        Expert expert = expertRepository.findByExpertID("2");
+    }
 
     @RequestMapping("/user/login")
     @ResponseBody

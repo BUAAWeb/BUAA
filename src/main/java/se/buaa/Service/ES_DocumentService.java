@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface ES_DocumentService {
-    List<ES_Document> findAll(PageRequest page);
+    Iterable<ES_Document> findAll(PageRequest page);
 
     void save(List<ES_Document> documentList);
 
@@ -16,6 +16,6 @@ public interface ES_DocumentService {
 
     List<ES_Document> findByTitle(String title);
 
-    Iterable<ES_Document> findByKeywords(String keyword,PageRequest page);
-    Iterable<ES_Document> findByKeywordsLike(List<String> keywords);
+    List<ES_Document> findByKeywords(String keyword);
+    List<ES_Document> findByKeywordsLike(List<String> keywords);
 }

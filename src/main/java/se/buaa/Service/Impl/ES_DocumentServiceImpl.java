@@ -21,7 +21,7 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
 
 
     @Override
-    public List<ES_Document> findAll(PageRequest page) {
+    public Page<ES_Document> findAll(PageRequest page) {
         return es_documentDao.findAll(page);
     }
 
@@ -40,10 +40,10 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
         return es_documentDao.findByTitleLike(title);
     }
 
-    @Override
-    public Iterable<ES_Document> findByKeywords(String keyword, PageRequest page) {
-        return null;
-    }
+//    @Override
+//    public Iterable<ES_Document> findByKeywords(String keyword, PageRequest page) {
+//        return null;
+//    }
 
     @Override
     public List<ES_Document> findByKeywords(String keyword) {
