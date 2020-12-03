@@ -67,10 +67,10 @@ public class AcademicController {
     ) {
 
         if(sortWay.compareTo("cited")==0){
-            return new Result<SearchResultData>(200,"success");
+            return new Result<SearchResultData>("200","success");
         }
         else if(sortWay.compareTo("time")==0){
-            return new Result<SearchResultData>(200,"success");
+            return new Result<SearchResultData>("200","success");
         }
         else{
             Sort.Order order = Sort.Order.desc("cited_quantity");
@@ -84,7 +84,7 @@ public class AcademicController {
             highCitedList.forEach(single ->{documentsList.add(single);});
             SearchResultData data=new SearchResultData();
             data.documentList=documentsList;
-            return new Result<SearchResultData>(200,"success",data);
+            return new Result<SearchResultData>("200","success",data);
         }
 
 

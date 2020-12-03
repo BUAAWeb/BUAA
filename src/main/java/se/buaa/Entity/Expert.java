@@ -16,9 +16,28 @@ public class Expert {
     private int cited_Times;
     @Column(name = "achievements")//成果数
     private int achievements;
+    @Column(name = "views")
+    private int views;
+
+
+    public int getViews() {
+        return views;
+    }
 
     public String getOrg() {
         return org;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCited_Times() {
+        return cited_Times;
+    }
+
+    public int getAchievements() {
+        return achievements;
     }
 
     public String getExpertID() {

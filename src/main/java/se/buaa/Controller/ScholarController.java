@@ -4,13 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.util.Pair;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import se.buaa.Entity.Data.Achievement;
+import se.buaa.Entity.Data.ScholarInfo;
+import se.buaa.Entity.Document;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Relation.Document_Expert;
 import se.buaa.Entity.Response.Result;
+import se.buaa.Exception.ScholarException;
 import se.buaa.Repository.Docu_ExpertRepository;
 import se.buaa.Repository.DocumentRepository;
 import se.buaa.Repository.ExpertRepository;
@@ -19,6 +20,7 @@ import java.util.*;
 
 @CrossOrigin
 @RestController
+@RequestMapping("/scholar")
 public class ScholarController {
     @Autowired
     ExpertRepository expertRepository;
@@ -27,21 +29,25 @@ public class ScholarController {
     @Autowired
     DocumentRepository documentRepository;
 
-    @GetMapping("/scholar/getCoAuthors")
+
+    @GetMapping("/getCoAuthors")
     public Result getcoAuthors(@RequestParam("scholar_id") String scholar_id){
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
+
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
                 .withIgnorePaths("id").withIgnorePaths("documentid");
-        //可视情况使用ES进行优化
-        Document_Expert tmpRelation=new Document_Expert();
+        // 可视情况使用ES进行优化
+        Document_Expert tmpRelation = new Document_Expert();
         tmpRelation.setExpertID(scholar_id);
         Example<Document_Expert> example = Example.of(tmpRelation,matcher);
         List<Document_Expert> all_docs = docu_expertRepository.findAll(example);
+
         matcher = ExampleMatcher.matching()
                 .withMatcher("documentid", ExampleMatcher.GenericPropertyMatcher::exact)
                 .withIgnorePaths("id").withIgnorePaths("expertid");
         List<Document_Expert> this_experts;
+
         for(Document_Expert doc:all_docs){
             tmpRelation.setDocumentID(doc.getDocumentID());
             example = Example.of(tmpRelation,matcher);
@@ -86,7 +92,7 @@ public class ScholarController {
     }
 
 
-    @GetMapping("/scholar/getCoAffiliate")
+    @GetMapping("/getCoAffiliate")
     public Result getcoAffiliate(@RequestParam("scholar_id") String scholar_id) {
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
 //        ExampleMatcher matcher = ExampleMatcher.matching()
@@ -155,6 +161,99 @@ public class ScholarController {
 
     }
 
+    /** 获取科研人员相关信息 */
+    @PostMapping("/getInfo")
+    public Result getScholarInfo(@RequestParam(value = "scholar_id", required = true) String scholar_id) {
+        Expert expert = expertRepository.findByExpertID(scholar_id);
 
+        // 错误处理，类型码在 ErrorConfig.xml 文件中，类型码要和创建的 Exception 类关联
+        // Exception 类的创建方法详见 ScholarException
+        if (expert == null) return Result.Error(new ScholarException("00"));
+
+        ScholarInfo scholarInfo = new ScholarInfo();
+
+        scholarInfo.name = expert.getName();
+        scholarInfo.volume = expert.getViews();
+        scholarInfo.scholar_id = expert.getExpertID();
+        scholarInfo.affiliate = expert.getOrg();
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
+                .withIgnorePaths("id").withIgnorePaths("documentid");
+        Document_Expert tmpRelation = new Document_Expert();
+        tmpRelation.setExpertID(scholar_id);
+        Example<Document_Expert> example = Example.of(tmpRelation, matcher);
+        List<Document_Expert> exp_docs = docu_expertRepository.findAll(example);
+
+        int size = Math.min(exp_docs.size(), 4);
+        for (int i = 0; i < size; i++) {
+            Document doc = documentRepository.findByDocumentID(exp_docs.get(i).getDocumentID());
+            scholarInfo.achList.add(new Achievement(doc.getTitle(), doc.getCitedQuantity()));
+        }
+
+        return Result.Success(scholarInfo);
+    }
+
+    /** 获取科研人员相关文档 */
+    @PostMapping("/getRelateSc")
+    @ResponseBody
+    public Result getScRelatedDoc (@RequestBody Map<String, Object> map) {
+        /* 查询字段提取 */
+        String scholar_id = map.get("scholar_id").toString();
+
+        Expert expert = expertRepository.findByExpertID(scholar_id);
+        if (expert == null) return Result.Error(new ScholarException("00"));
+
+        String sc_year = map.get("sc_year").toString();
+        int paper_type = Integer.parseInt(map.get("paper_type").toString());
+
+        String first_author = expert.getExpertID();
+        int first_author_flag = Integer.parseInt(map.get("first_author").toString());
+        String sc_sort = map.get("sc_sort").toString();
+        int page = Integer.parseInt(map.get("page").toString());
+
+//        ExampleMatcher matcher = ExampleMatcher.matching()
+//                .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
+//                .withIgnorePaths("id").withIgnorePaths("documentid");
+//        Document_Expert tmpRelation = new Document_Expert();
+//        tmpRelation.setExpertID(scholar_id);
+//        Example<Document_Expert> example = Example.of(tmpRelation, matcher);
+//        List<Document_Expert> exp_docs = docu_expertRepository.findAll(example);
+//        List<Document> docs = new ArrayList<>();
+//
+//        for (int i = 0; i < exp_docs.size(); i++) {
+//            docs.add(documentRepository.findByDocumentID(exp_docs.get(i).getDocumentID()));
+//        }
+
+        ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("date", ExampleMatcher.GenericPropertyMatcher::startsWith)
+                .withMatcher("document_type", ExampleMatcher.GenericPropertyMatcher::exact);
+        Document tmpDoc = new Document();
+        tmpDoc.setDate(sc_year);
+        tmpDoc.setDocument_type(paper_type);
+
+        if (first_author_flag == 0) {
+            matcher.withMatcher("experts", ExampleMatcher.GenericPropertyMatcher::contains);
+            tmpDoc.setExperts(first_author);
+        }
+        else {
+            matcher.withMatcher("first_author", ExampleMatcher.GenericPropertyMatcher::contains);
+            tmpDoc.setFirst_author(first_author);
+        }
+
+        Example<Document> example = Example.of(tmpDoc, matcher);
+        List<Document> docs = documentRepository.findAll(example);
+
+        if (sc_sort.equals("time")) {
+            docs.sort(Comparator.comparing(Document::getDate));
+        }
+        else if (sc_sort.equals("cited")) {
+            docs.sort(Comparator.comparing(Document::getCitedQuantity));
+        }
+
+        /** unfinished */
+        for (int i = 10 * (page-1); i < Math.min(docs.size(), 10 * page); i++) {}
+
+        return Result.Success();
+    }
 
 }
