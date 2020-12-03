@@ -21,7 +21,7 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
 
 
     @Override
-    public Iterable<ES_Document> findAll(PageRequest page) {
+    public List<ES_Document> findAll(PageRequest page) {
         return es_documentDao.findAll(page);
     }
 

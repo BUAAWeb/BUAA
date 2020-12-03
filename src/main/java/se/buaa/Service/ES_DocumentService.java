@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface ES_DocumentService {
-    Iterable<ES_Document> findAll(PageRequest page);
+    List<ES_Document> findAll(PageRequest page);
 
     void save(List<ES_Document> documentList);
 
