@@ -1,12 +1,26 @@
 package se.buaa.Controller;
 
-
+//200（OK）- 如果现有资源已被更改
+//201（created）- 如果新资源被创建
+//202（accepted）- 已接受处理请求但尚未完成（异步处理）
+//301（Moved Permanently）- 资源的URI被更新
+//303（See Other）- 其他（如，负载均衡）
+//400（bad request）- 指代坏请求
+//404 （not found）- 资源不存在
+//406 （not acceptable）- 服务端不支持所需表示
+//409 （conflict）- 通用冲突
+//412 （Precondition Failed）- 前置条件失败（如执行条件更新时的冲突）
+//415 （unsupported media type）- 接受到的表示不受支持
+//500 （internal server error）- 通用错误响应
+//503 （Service Unavailable）- 服务当前无法处理请求
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.Response.Result;
 import se.buaa.Service.ES_DocumentService;
@@ -34,6 +48,37 @@ public class AcademicController {
             return new Result<>(200, "success", highCitedList);
         else
             return new Result<>(400,"error",null);
+        return new Result<Iterable<ES_Document>>(200,"success",highCitedList);
+    }
+    @RequestMapping("getSearchResult")
+    public Result<SearchResultData> findsearchresult(@RequestParam String kw,//keyword
+                                                          @RequestParam String au,//author
+                                                          @RequestParam("sort") String sortWay, //排序方式
+                                                          @RequestParam("page") Integer pageNumber //页数
+    ) {
+
+        if(sortWay.compareTo("cited")==0){
+            return new Result<SearchResultData>(200,"success");
+        }
+        else if(sortWay.compareTo("time")==0){
+            return new Result<SearchResultData>(200,"success");
+        }
+        else{
+            Sort.Order order = Sort.Order.desc("cited_quantity");
+            List<Sort.Order> orderList = new ArrayList<>();
+//        orderList.add(order1);
+            orderList.add(order);
+            Sort sort = Sort.by(orderList);
+            PageRequest page = PageRequest.of(0, 10 ,sort);
+            Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
+            List<ES_Document> documentslist = new ArrayList<>();
+            highCitedList.forEach(single ->{documentslist.add(single);});
+            SearchResultData data=new SearchResultData();
+            data.documentList=documentslist;
+            return new Result<SearchResultData>(200,"success",data);
+        }
+
+
     }
 
 //    @RequestMapping("getById")

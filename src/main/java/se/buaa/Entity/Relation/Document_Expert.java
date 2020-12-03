@@ -12,4 +12,20 @@ public class Document_Expert {
     private String expertID;
     @Column(name = "documentID")
     private String documentID;
+
+    public String getExpertID() {
+        return expertID;
+    }
+
+    public void setExpertID(String expertID) {
+        this.expertID = expertID;
+    }
+
+    public String getDocumentID() {
+        return documentID;
+    }
+
+    public void setDocumentID(String documentID) {
+        this.documentID = documentID;
+    }
 }

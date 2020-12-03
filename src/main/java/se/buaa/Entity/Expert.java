@@ -17,6 +17,13 @@ public class Expert {
     @Column(name = "achievements")//成果数
     private int achievements;
 
+    public String getOrg() {
+        return org;
+    }
+
+    public String getExpertID() {
+        return expertID;
+    }
 }
 
 
