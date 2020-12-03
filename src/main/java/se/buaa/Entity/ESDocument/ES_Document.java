@@ -1,8 +1,6 @@
 package se.buaa.Entity.ESDocument;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Lombok;
+import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -23,6 +21,9 @@ public class ES_Document {
     private String id;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String title;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String experts;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
@@ -37,6 +38,8 @@ public class ES_Document {
     @Transient
     private List<String> authors = new ArrayList<>();
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @Autowired
     ExpertRepository expertRepository;
 
@@ -55,7 +58,7 @@ public class ES_Document {
 //        for(String name : authorNames){
 //            System.out.println(name);
 //        }
-        System.out.println(this.authors);
+//        System.out.println(this.authors);
     }
 
 }
