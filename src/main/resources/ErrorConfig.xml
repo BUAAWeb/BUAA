@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <errors>
     <scholar code="00">
-        <error code="00" msg="相关学者不存在"
+        <error code="00" msg="缺失id的无效查询"
+               classname="se.buaa.Exception.ScholarException"/>
+        <error code="01" msg="相关学者不存在"
                 classname="se.buaa.Exception.ScholarException"/>
     </scholar>
 

@@ -57,7 +57,7 @@ public class AcademicController {
 //        }
         Data data = new Data();
         data.setResult_list(documentsList);
-        return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),data);
+        return new Result("200", CodeEnum.success.toString(), data);
 //        if(highCitedList != null)
 //            return new Result<>(200, "success",highCitedList);
 //        else

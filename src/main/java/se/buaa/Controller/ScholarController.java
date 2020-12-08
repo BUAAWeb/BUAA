@@ -194,65 +194,104 @@ public class ScholarController {
         return Result.Success(scholarInfo);
     }
 
-    /** 获取科研人员相关文档 */
-    @PostMapping("/getRelateSc")
-    @ResponseBody
-    public Result getScRelatedDoc (@RequestBody Map<String, Object> map) {
-        /* 查询字段提取 */
-        String scholar_id = map.get("scholar_id").toString();
-
-        Expert expert = expertRepository.findByExpertID(scholar_id);
-        if (expert == null) return Result.Error(new ScholarException("00"));
-
-        String sc_year = map.get("sc_year").toString();
-        int paper_type = Integer.parseInt(map.get("paper_type").toString());
-
-        String first_author = expert.getExpertID();
-        int first_author_flag = Integer.parseInt(map.get("first_author").toString());
-        String sc_sort = map.get("sc_sort").toString();
-        int page = Integer.parseInt(map.get("page").toString());
-
-//        ExampleMatcher matcher = ExampleMatcher.matching()
-//                .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
-//                .withIgnorePaths("id").withIgnorePaths("documentid");
-//        Document_Expert tmpRelation = new Document_Expert();
-//        tmpRelation.setExpertID(scholar_id);
-//        Example<Document_Expert> example = Example.of(tmpRelation, matcher);
-//        List<Document_Expert> exp_docs = docu_expertRepository.findAll(example);
-//        List<Document> docs = new ArrayList<>();
+//    /** 获取科研人员相关文档 */
+//    @PostMapping("/getRelateSc")
+//    @ResponseBody
+//    public Result getScRelatedDoc (@RequestBody Map<String, Object> map) {
+//        /* 查询字段提取 */
+//        if (map.get("scholar_id") == null) return Result.Error(new ScholarException("00"));
+//        String scholar_id = map.get("scholar_id").toString();
 //
-//        for (int i = 0; i < exp_docs.size(); i++) {
-//            docs.add(documentRepository.findByDocumentID(exp_docs.get(i).getDocumentID()));
+//        Expert expert = expertRepository.findByExpertID(scholar_id);
+//        if (expert == null) return Result.Error(new ScholarException("01"));
+//
+////        ExampleMatcher matcher = ExampleMatcher.matching()
+////                .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
+////                .withIgnorePaths("id").withIgnorePaths("documentid");
+////        Document_Expert tmpRelation = new Document_Expert();
+////        tmpRelation.setExpertID(scholar_id);
+////        Example<Document_Expert> example = Example.of(tmpRelation, matcher);
+////        List<Document_Expert> exp_docs = docu_expertRepository.findAll(example);
+////        List<Document> docs = new ArrayList<>();
+////
+////        for (int i = 0; i < exp_docs.size(); i++) {
+////            docs.add(documentRepository.findByDocumentID(exp_docs.get(i).getDocumentID()));
+////        }
+//
+//        ExampleMatcher matcher = ExampleMatcher.matching();
+//        Document tmpDoc = new Document();
+//
+//        if (map.get("sc_year") != null) {
+//            String sc_year = map.get("sc_year").toString();
+//            if (!sc_year.equals("")) {
+//                matcher.withMatcher("date", ExampleMatcher.GenericPropertyMatcher::startsWith);
+//                tmpDoc.setDate(sc_year);
+//            }
 //        }
+//
+//        if (map.get("paper_type") != null) {
+//            int paper_type = Integer.parseInt(map.get("paper_type").toString());
+//            matcher.withMatcher("document_type", ExampleMatcher.GenericPropertyMatcher::exact);
+//            tmpDoc.setDocument_type(paper_type);
+//        }
+//
+//        int first_author_flag = 0;
+//        if (map.get("first_author") != null) {
+//            first_author_flag = Integer.parseInt(map.get("first_author").toString());
+//        }
+//        String author = expert.getName();
+//
+//        if (first_author_flag == 0) {
+//            matcher.withMatcher("experts", ExampleMatcher.GenericPropertyMatcher::contains);
+//            tmpDoc.setExperts(author);
+//        }
+//        else {
+//            matcher.withMatcher("first_author", ExampleMatcher.GenericPropertyMatcher::contains);
+//            tmpDoc.setFirst_author(author);
+//        }
+//
+//
+//        Example<Document> example = Example.of(tmpDoc, matcher);
+//        List<Document> docs = documentRepository.findAll(example);
+//
+//        String sc_sort = "";
+//        if (map.get("sc_sort") != null) {
+//            sc_sort = map.get("sc_sort").toString();
+//        }
+//
+//        if (sc_sort.equals("time")) {
+//            docs.sort(Comparator.comparing(Document::getDate));
+//        }
+//        else if (sc_sort.equals("cited")) {
+//            docs.sort(Comparator.comparing(Document::getCitedQuantity));
+//        }
+//
+//        int page = 0;
+//        if (map.get("page") != null) {
+//            page = Integer.parseInt(map.get("page").toString());
+//        }
+//
+//        List<ScRelateDoc> list = new ArrayList<>();
+//        /** unfinished */
+//        for (int i = 10 * (page-1); i < Math.min(docs.size(), 10 * page); i++) {
+//            ScRelateDoc scRelateDoc = new ScRelateDoc();
+//            Document doc = docs.get(i);
+//            scRelateDoc.setDocId(doc.getDocumentID());
+//            scRelateDoc.setTitled(doc.getTitle());
+//            scRelateDoc.setAuthors(doc.getExperts());
+//            scRelateDoc.setCited(doc.getCitedQuantity());
+//            scRelateDoc.setSummary(doc.getSummary());
+//            list.add(scRelateDoc);
+//        }
+//
+//        return Result.Success(list);
+//    }
 
-        ExampleMatcher matcher = ExampleMatcher.matching().withMatcher("date", ExampleMatcher.GenericPropertyMatcher::startsWith)
-                .withMatcher("document_type", ExampleMatcher.GenericPropertyMatcher::exact);
-        Document tmpDoc = new Document();
-        tmpDoc.setDate(sc_year);
-        tmpDoc.setDocument_type(paper_type);
-
-        if (first_author_flag == 0) {
-            matcher.withMatcher("experts", ExampleMatcher.GenericPropertyMatcher::contains);
-            tmpDoc.setExperts(first_author);
-        }
-        else {
-            matcher.withMatcher("first_author", ExampleMatcher.GenericPropertyMatcher::contains);
-            tmpDoc.setFirst_author(first_author);
-        }
-
-        Example<Document> example = Example.of(tmpDoc, matcher);
-        List<Document> docs = documentRepository.findAll(example);
-
-        if (sc_sort.equals("time")) {
-            docs.sort(Comparator.comparing(Document::getDate));
-        }
-        else if (sc_sort.equals("cited")) {
-            docs.sort(Comparator.comparing(Document::getCitedQuantity));
-        }
-
-        /** unfinished */
-        for (int i = 10 * (page-1); i < Math.min(docs.size(), 10 * page); i++) {}
-
+    /** 关注、取消关注 */
+    @GetMapping("/focusScholar")
+    @ResponseBody
+    public Result focusScholar(@RequestParam(value = "scholar_id", required = true) String scholar_id
+                            , @RequestParam(value = "user_id", required = true) String user_id) {
         return Result.Success();
     }
 
