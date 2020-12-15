@@ -11,9 +11,11 @@ public class ApplicationForm{
     public Integer formID;
     public int userID;
     public int flag;            //为0时表示认领文献，1时认领门户
-    public int objectID;        //分别对应文献或门户的ID
-    public Date time;
-    public String result;
-    public String resultInfo;
-
+    public String objectID;        //分别对应文献或门户的ID
+    public String time;
+    public int result;
+    public String email;
+    public String userName;
+    public String objectName;
+    public String msg;
 }
