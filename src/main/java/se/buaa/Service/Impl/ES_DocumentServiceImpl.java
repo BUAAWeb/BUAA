@@ -19,7 +19,6 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
     @Autowired
     ES_DocumentDao es_documentDao;
 
-
     @Override
     public Page<ES_Document> findAll(PageRequest page) {
         return es_documentDao.findAll(page);

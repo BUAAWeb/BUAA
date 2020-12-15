@@ -1,10 +1,10 @@
 spring:
-  elasticsearch:
-    cluster-name: my-application
-    cluster-nodes: localhost:9300
-    local: yes
-    repositories:
-      enable: true
+  data:
+#    elasticsearch:
+#      cluster-name: BUAA-application
+#      cluster-nodes: 49.232.157.22:9300
+#      repositories:
+#        enable: true
   mvc:
     static-path-pattern: /static/**
   datasource:

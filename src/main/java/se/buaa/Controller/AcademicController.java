@@ -13,13 +13,34 @@ package se.buaa.Controller;
 //415 （unsupported media type）- 接受到的表示不受支持
 //500 （internal server error）- 通用错误响应
 //503 （Service Unavailable）- 服务当前无法处理请求
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.common.collect.Map;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregator;
+import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.ESDocument.ES_Document;
@@ -38,8 +59,34 @@ import java.util.List;
 @RequestMapping("/academic")
 public class AcademicController {
     @Autowired
+    ES_DocumentDao es_documentDao;
+
+    @Autowired
     ES_DocumentService es_documentService;
 
+    @RequestMapping("test")
+    public Iterable<ES_Document> test(ElasticsearchOperations elasticsearchOperations){
+        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("title", "小米");
+        // 执行查询
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+        nativeSearchQueryBuilder.withQuery(queryBuilder);
+        nativeSearchQueryBuilder.withSearchType(SearchType.QUERY_THEN_FETCH);
+
+        TermsAggregationBuilder tb =  AggregationBuilders.terms("citedQuantity").field("cited_quantity");
+        nativeSearchQueryBuilder.addAggregation(tb);
+        NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
+
+        Page<ES_Document> items = es_documentDao.search(nativeSearchQuery);
+
+//        Aggregations agg = elasticsearchOperations(nativeSearchQuery, searchResponse -> {
+//            Aggregations aggregations = searchResponse.getAggregations();
+//            return aggregations;
+//        });
+
+        //这里是Storm流的写法，jdk8的新特性
+        items.forEach(System.out::println);
+        return items;
+    }
 
     @RequestMapping("getHighCited")
     public Result<Data> getHighCited() {

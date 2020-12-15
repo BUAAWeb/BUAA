@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Service.ES_DocumentService;
 
@@ -22,6 +23,8 @@ import java.util.List;
 public class DocumentController {
     @Autowired
     ES_DocumentService es_documentService;
+    @Autowired
+    ES_DocumentDao es_documentDao;
 
     @RequestMapping("findAll")
     public Iterable<ES_Document> findAll() {
@@ -31,7 +34,7 @@ public class DocumentController {
 //        orderList.add(order1);
         orderList.add(order2);
         Sort sort = Sort.by(orderList);
-        PageRequest page = PageRequest.of(0, 100 ,sort);
+        PageRequest page = PageRequest.of(0, 200000 );
         return es_documentService.findAll(page);
     }
 
