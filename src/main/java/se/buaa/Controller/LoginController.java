@@ -2,10 +2,14 @@ package se.buaa.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import se.buaa.Config.JwtUtils;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.User;
 import se.buaa.Repository.ExpertRepository;
 import se.buaa.Repository.UserRepository;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -31,6 +35,11 @@ public class LoginController {
             result.code=200;
             result.msg="登录成功";
             result.data.userID = db_user.userID;
+            Map map = new HashMap<>();
+            map.put("id",db_user.userID);
+            map.put("username",db_user.userName);
+            map.put("password",db_user.passwd);
+            result.data.token = JwtUtils.createToken(map);
         }
         else {
             result.code = 201;
@@ -41,6 +50,7 @@ public class LoginController {
     }
     private class Data{
         int userID=-1;
+        String token;
     }
     private class Result{
         int code;
