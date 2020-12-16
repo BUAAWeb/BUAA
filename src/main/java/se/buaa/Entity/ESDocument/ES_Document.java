@@ -52,6 +52,7 @@ public class ES_Document {
         this.summary = summary;
         this.link = link;
         this.cited_quantity = cited_quantity;
+
         String[] authorNames = experts.split(",");
 //        System.out.print("1");
         Collections.addAll(authors, authorNames);
