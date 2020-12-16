@@ -12,7 +12,6 @@ import se.buaa.Repository.UserRepository;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
 public class LoginController {
     @Autowired

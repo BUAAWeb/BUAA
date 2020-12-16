@@ -20,7 +20,7 @@ public class SendEmailController {
         System.out.println(email);
         int verification;
         try {
-            verification=(int)Math.round((Math.random()+1) * 1000);
+            verification=(int)Math.round((Math.random()) * 10000);
             MailSender.sendMail(email, "欢迎您使用LinkedBrains学术搜索引擎！\n您的验证码为:"+verification+"，请尽快完成验证\n\n---------From BUAA科技集团");
         }catch (Exception e){
             return Result.Error("201","邮件发送异常，请联系管理员或重试。");
