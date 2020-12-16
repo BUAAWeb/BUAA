@@ -92,38 +92,38 @@ public class ApplicationController {
         applicationForm.result = 1;
         return Result.Success();
     }
-    private class createReq{
-        String token;
-        int userID;
-        String ObjectID;
-        int flag;
-        String email;
+    public class createReq{
+        public String token;
+        public int userID;
+        public String ObjectID;
+        public int flag;
+        public String email;
     }
 
 
-    private class getAllReq{
-        int size;
-        int page;
-        boolean isAll;
-        String token;
-        int flag;
+    public class getAllReq{
+        public int size;
+        public int page;
+        public boolean isAll;
+        public String token;
+        public int flag;
 
     }
-    private class rejectReq{
-        String token;
-        int formID;
-        String reason;
+    public class rejectReq{
+        public String token;
+        public int formID;
+        public String reason;
 
     }
-    private class agreeReq{
-        String token;
-        int formID;
+    public class agreeReq{
+        public String token;
+        public int formID;
     }
-    private class getAllRes{
-        int totalPages;
-        int page;
-        int totalElements;
-        ArrayList<ApplicationForm> rows = new ArrayList<>();
+    public class getAllRes{
+        public int totalPages;
+        public int page;
+        public int totalElements;
+        public ArrayList<ApplicationForm> rows = new ArrayList<>();
     }
 
 }
