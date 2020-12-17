@@ -211,9 +211,15 @@ public class AcademicController {
 //            return new Result<SearchResultData>("200","success",data);
 //        }
     }
-//
-//    @RequestMapping("getById")
-//    public Result<Iterable<ES_Document>> getById(String id){
-//
-//    }
+
+    @RequestMapping("getById")
+    public Result<ES_Document> getById(String id){
+        if(id == null)
+            return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
+        ES_Document es_document = es_documentDao.findByDocumentid(id);
+        if(es_document == null)
+            return new Result<>(CodeEnum.documentNotExist.getCode(), CodeEnum.documentNotExist.toString(),null);
+        else
+            return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
+    }
 }

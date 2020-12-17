@@ -1,7 +1,7 @@
 package se.buaa.Entity.Enumeration;
 
 public enum CodeEnum {
-    success,sortNotFound,pageNotInteger,pageLessThanOne,pageOutOfRange;
+    success,sortNotFound,pageNotInteger,pageLessThanOne,pageOutOfRange,documentNotExist,docIdNotExist;
 
     public String getCode(){
         switch (this){
@@ -15,6 +15,10 @@ public enum CodeEnum {
                 return "303";
             case pageOutOfRange:
                 return "304";
+            case documentNotExist:
+                return "305";
+            case docIdNotExist:
+                return "306";
             default:
                 return "404";
         }
@@ -32,6 +36,10 @@ public enum CodeEnum {
                 return "Page is less than 1";
             case pageOutOfRange:
                 return "Page is out of range";
+            case documentNotExist:
+                return "Document is not exist";
+            case docIdNotExist:
+                return "The Document ID you search is not exist";
             default:
                 return "404";
         }

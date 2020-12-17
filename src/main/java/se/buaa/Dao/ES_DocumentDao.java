@@ -16,6 +16,7 @@ import java.util.List;
 
 //@NoRepositoryBean
 public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Long> {
+    ES_Document findByDocumentid(String id);
     List<ES_Document> findByKeywordsLike(String keyword);
     List<ES_Document> findByKeywords(String keyword);
     List<ES_Document> findByTitleLike(String title);
