@@ -158,6 +158,15 @@ public class AcademicController {
             return new Result<Data>(CodeEnum.pageLessThanOne.getCode(),CodeEnum.pageLessThanOne.toString(),new Data());
         }
 
+        int total = es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
+                searchWords.getStartTime(),
+                searchWords.getEndTime());
+
+        if( ( total +1 ) / 10 + 1 < pageNum )
+            return new Result<Data>(CodeEnum.pageOutOfRange.getCode(),CodeEnum.pageOutOfRange.toString(),new Data());
+
         Sort.Order order;
         switch (sort){
             case "cited":
@@ -186,8 +195,7 @@ public class AcademicController {
         List<ES_Document> documentsList = new ArrayList<>();
         searchResult.forEach(single ->{documentsList.add(single);});
         data.setResult_list(documentsList);
-        data.setTotal(documentsList.size());
-        System.out.println(page1.getPageNumber());
+        data.setTotal(total);
         return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
 //        data.setTotal();
 //        if(sortWay.compareTo("cited")==0){
