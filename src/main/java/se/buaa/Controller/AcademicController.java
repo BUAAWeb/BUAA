@@ -55,6 +55,7 @@ import se.buaa.Service.ES_DocumentService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 //@CrossOrigin
 @CrossOrigin(allowCredentials="false")
@@ -145,7 +146,14 @@ public class AcademicController {
 //                                                         @RequestParam("sort") String sortWay, //排序方式
 //                                                         @RequestParam("page") Integer pageNumber //页数
     ) {
+        System.out.println(searchWords.getStartTime().equals(""));
         int pageNum;
+
+        if(searchWords.getStartTime() != null && !Pattern.matches("\\d*",searchWords.getStartTime()))
+            return new Result<Data>(CodeEnum.error.getCode(),CodeEnum.error.toString(),new Data());
+
+        if(searchWords.getEndTime() != null && !Pattern.matches("\\d*",searchWords.getEndTime()))
+            return new Result<Data>(CodeEnum.error.getCode(),CodeEnum.error.toString(),new Data());
 
         if(page == null)
             return new Result<Data>(CodeEnum.noPage.getCode(),CodeEnum.noPage.toString(),new Data());
