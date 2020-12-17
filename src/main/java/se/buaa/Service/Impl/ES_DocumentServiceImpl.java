@@ -63,9 +63,9 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
 
     @Override
     public Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,String keywords, String experts, String origin, String startTime, String endTime) {
-        if(startTime == null)
+        if(startTime == null || startTime.equals(""))
             startTime = "0";
-        if(endTime == null)
+        if(endTime == null || endTime.equals(""))
             endTime = "2020";
         keywords = keywords == null ? "":keywords;
         experts = experts == null ? "":experts;
@@ -75,9 +75,9 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
 
     @Override
     public int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(String keywords, String experts, String origin, String startTime, String endTime) {
-        if(startTime == null)
+        if(startTime == null || startTime.equals(""))
             startTime = "0";
-        if(endTime == null)
+        if(endTime == null || endTime.equals(""))
             endTime = "2020";
         keywords = keywords == null ? "":keywords;
         experts = experts == null ? "":experts;
