@@ -158,7 +158,7 @@ public class AcademicController {
             return new Result<Data>(CodeEnum.pageLessThanOne.getCode(),CodeEnum.pageLessThanOne.toString(),new Data());
         }
 
-        int total = es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+        int total = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
                 searchWords.getExperts(),
                 searchWords.getOrigin(),
                 searchWords.getStartTime(),

@@ -67,7 +67,32 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
             startTime = "0";
         if(endTime == null)
             endTime = "2020";
+        keywords = keywords == null ? "":keywords;
+        experts = experts == null ? "":experts;
+        origin = origin == null ? "":origin;
         return es_documentDao.findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(page,keywords, experts, origin, startTime, endTime);
+    }
+
+    @Override
+    public int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(String keywords, String experts, String origin, String startTime, String endTime) {
+        if(startTime == null)
+            startTime = "0";
+        if(endTime == null)
+            endTime = "2020";
+        keywords = keywords == null ? "":keywords;
+        experts = experts == null ? "":experts;
+        origin = origin == null ? "":origin;
+        return es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(keywords, experts, origin, startTime, endTime);
+    }
+
+    public static void handleParams(String keywords, String experts, String origin, String startTime, String endTime){
+        if(startTime == null)
+            startTime = "0";
+        if(endTime == null)
+            endTime = "2020";
+        keywords = keywords == null ? "":keywords;
+        experts = experts == null ? "":experts;
+        origin = origin == null ? "":origin;
     }
 
     public static List removeDuplicate(List list) {

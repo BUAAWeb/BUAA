@@ -21,4 +21,6 @@ public interface ES_DocumentService {
     List<ES_Document> findByKeywordsLike(List<String> keywords);
     Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
                                                                           String keywords, String experts, String origin, String startTime, String endTime);
+    int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(
+            String keywords,String experts,String origin,String startTime,String endTime);
 }
