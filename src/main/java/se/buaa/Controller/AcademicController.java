@@ -39,6 +39,8 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.web.bind.annotation.*;
 import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Dao.ES_ExpertDao;
+import se.buaa.Entity.Collection;
+import se.buaa.Entity.CollectionKey;
 import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.ESDocument.ES_Document;
@@ -49,6 +51,7 @@ import se.buaa.Entity.Response.Result;
 import se.buaa.FontEntity.Filter;
 import se.buaa.FontEntity.Filter_Item;
 import se.buaa.FontEntity.SearchWords;
+import se.buaa.Repository.CollectionRepository;
 import se.buaa.Repository.ExpertRepository;
 import se.buaa.Service.ES_DocumentService;
 
@@ -56,6 +59,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.Optional;
+
 
 //@CrossOrigin
 @CrossOrigin(allowCredentials="false")
@@ -70,6 +75,9 @@ public class AcademicController {
 
     @Autowired
     ES_ExpertDao es_expertDao;
+
+    @Autowired
+    CollectionRepository collectionRepository;
 
     @RequestMapping("test")
     public Iterable<ES_Document> test(ElasticsearchOperations elasticsearchOperations){
@@ -310,5 +318,23 @@ public class AcademicController {
             return new Result<>(CodeEnum.documentNotExist.getCode(), CodeEnum.documentNotExist.toString(),null);
         else
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
+    }
+
+    @GetMapping("favorSc")
+    public Result<Boolean> favorSc(@RequestParam("document_id") String doc_id,@RequestParam("user_id") int user_id){
+        CollectionKey ck =new CollectionKey(user_id,doc_id);
+        Optional<Collection> res = collectionRepository.findById(ck);
+        if(res.isPresent())
+        {
+            collectionRepository.deleteById(ck);
+            return Result.Success(false);
+        }
+        else
+        {
+            Collection collection = new Collection(ck);
+            collectionRepository.save(collection);
+            return Result.Success(true);
+        }
+
     }
 }
