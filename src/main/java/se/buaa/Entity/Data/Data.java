@@ -9,5 +9,6 @@ import java.util.List;
 public class Data {
     private int total;
     private List<ES_Document> result_list = new ArrayList<>();
-//    private List<> filter_list = new ArrayList<>();
+    private List<Filter> filter_list = new ArrayList<>();
+
 }

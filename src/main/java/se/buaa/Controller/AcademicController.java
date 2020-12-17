@@ -196,6 +196,16 @@ public class AcademicController {
         searchResult.forEach(single ->{documentsList.add(single);});
         data.setResult_list(documentsList);
         data.setTotal(total);
+        String year=searchWords.getStartTime();
+        year=year.substring(0,4);
+        int year1=Integer.parseInt(year);
+        int year2=year1-1;
+        int year2=year1-2;
+        int year1 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
+                searchWords.getStartTime(),
+                searchWords.getEndTime());
         return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
 //        data.setTotal();
 //        if(sortWay.compareTo("cited")==0){
@@ -218,6 +228,9 @@ public class AcademicController {
 //            data.documentList=documentsList;
 //            return new Result<SearchResultData>("200","success",data);
 //        }
+
+
+
     }
 
     @RequestMapping("getById")
