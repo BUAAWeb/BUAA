@@ -205,9 +205,13 @@ public class AcademicController {
 
         String year=searchWords.getEndTime();
         year=year.substring(0,4);
+        String startYear=searchWords.getStartTime();
+        Integer start=Integer.parseInt(startYear);
         Integer year1=Integer.parseInt(year);
         Integer  year2=year1-1;
         Integer  year3=year1-2;
+        Integer  year4=year1-5;
+        Integer  year5=year1-10;
         int count1 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
                 searchWords.getExperts(),
                 searchWords.getOrigin(),
@@ -223,24 +227,44 @@ public class AcademicController {
                 searchWords.getOrigin(),
                 year3.toString(),
                 searchWords.getEndTime());
-
-
+        int count4 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
+                year4.toString(),
+                searchWords.getEndTime());
+        int count5 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
+                year5.toString(),
+                searchWords.getEndTime());
         Filter filter=new Filter();
         filter.filter_name="时间";
         filter.title="时间";
         Filter_Item filter_item1=new Filter_Item();
         Filter_Item filter_item2=new Filter_Item();
         Filter_Item filter_item3=new Filter_Item();
+        Filter_Item filter_item4=new Filter_Item();
+        Filter_Item filter_item5=new Filter_Item();
         filter_item1.content=year1.toString()+"以来";
         filter_item1.number=count1;
         filter_item2.content=year2.toString()+"以来";
         filter_item2.number=count2;
         filter_item3.content=year3.toString()+"以来";
         filter_item3.number=count3;
+        filter_item4.content=year4.toString()+"以来";
+        filter_item4.number=count4;
+        filter_item5.content=year5.toString()+"以来";
+        filter_item5.number=count5;
+        if(start<=year1)
         filter.filter_itemList.add(filter_item1);
+        if(start<=year2)
         filter.filter_itemList.add(filter_item2);
+        if(start<=year3)
         filter.filter_itemList.add(filter_item3);
-
+        if(start<=year4)
+            filter.filter_itemList.add(filter_item4);
+        if(start<=year5)
+            filter.filter_itemList.add(filter_item5);
         data.filter_list.add(filter);
         return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
 //        data.setTotal();
