@@ -90,12 +90,12 @@ public class AcademicController {
 
     @RequestMapping("getHighCited")
     public Result<Data> getHighCited() {
-        Sort.Order order = Sort.Order.desc("cited_quantity");
+        Sort.Order order = Sort.Order.desc("time");
         List<Sort.Order> orderList = new ArrayList<>();
 //        orderList.add(order1);
         orderList.add(order);
         Sort sort = Sort.by(orderList);
-        PageRequest page = PageRequest.of(0, 10 ,sort);
+        PageRequest page = PageRequest.of(0, 100,sort);
         Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
         List<ES_Document> documentsList = new ArrayList<>();
         highCitedList.forEach(single ->{documentsList.add(single);});
@@ -140,7 +140,7 @@ public class AcademicController {
 
 
     }
-
+//
 //    @RequestMapping("getById")
 //    public Result<Iterable<ES_Document>> getById(String id){
 //
