@@ -46,6 +46,8 @@ import se.buaa.Entity.ESDocument.ES_Expert;
 import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Response.Result;
+import se.buaa.FontEntity.Filter;
+import se.buaa.FontEntity.Filter_Item;
 import se.buaa.FontEntity.SearchWords;
 import se.buaa.Repository.ExpertRepository;
 import se.buaa.Service.ES_DocumentService;
@@ -207,6 +209,47 @@ public class AcademicController {
         searchResult.forEach(single ->{documentsList.add(single);});
         data.setResult_list(documentsList);
         data.setTotal(total);
+
+
+        String year=searchWords.getEndTime();
+        year=year.substring(0,4);
+        Integer year1=Integer.parseInt(year);
+        Integer  year2=year1-1;
+        Integer  year3=year1-2;
+        int count1 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
+                year1.toString(),
+                searchWords.getEndTime());
+        int count2 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
+                year2.toString(),
+                searchWords.getEndTime());
+        int count3 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
+                year3.toString(),
+                searchWords.getEndTime());
+
+
+        Filter filter=new Filter();
+        filter.filter_name="时间";
+        filter.title="时间";
+        Filter_Item filter_item1=new Filter_Item();
+        Filter_Item filter_item2=new Filter_Item();
+        Filter_Item filter_item3=new Filter_Item();
+        filter_item1.content=year1.toString()+"以来";
+        filter_item1.number=count1;
+        filter_item2.content=year2.toString()+"以来";
+        filter_item2.number=count2;
+        filter_item3.content=year3.toString()+"以来";
+        filter_item3.number=count3;
+        filter.filter_itemList.add(filter_item1);
+        filter.filter_itemList.add(filter_item2);
+        filter.filter_itemList.add(filter_item3);
+
+        data.filter_list.add(filter);
         return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
 //        data.setTotal();
 //        if(sortWay.compareTo("cited")==0){
@@ -229,6 +272,9 @@ public class AcademicController {
 //            data.documentList=documentsList;
 //            return new Result<SearchResultData>("200","success",data);
 //        }
+
+
+
     }
 
     @RequestMapping("getById")
