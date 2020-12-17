@@ -201,6 +201,8 @@ public class AcademicController {
         searchResult.forEach(single ->{documentsList.add(single);});
         data.setResult_list(documentsList);
         data.setTotal(total);
+
+
         String year=searchWords.getEndTime();
         year=year.substring(0,4);
         Integer year1=Integer.parseInt(year);
