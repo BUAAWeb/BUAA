@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Filter_Item {
-    String content;
-    int number;
+    public String content;
+    public int number;
 }
