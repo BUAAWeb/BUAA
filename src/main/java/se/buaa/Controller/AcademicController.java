@@ -36,10 +36,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Dao.ES_ExpertDao;
 import se.buaa.Entity.Data.Data;
@@ -137,7 +134,7 @@ public class AcademicController {
     }
 
     @RequestMapping("getSearchResult")
-    public Result<Data> getSearchResult(SearchWords searchWords,String sort,String page,String userID
+    public Result<Data> getSearchResult(SearchWords searchWords, String sort, String page, String userID
 //            @RequestParam String kw,//keyword
 //                                                         @RequestParam String experts,//author
 //                                                         @RequestParam String origin,
@@ -147,11 +144,14 @@ public class AcademicController {
 //                                                         @RequestParam("page") Integer pageNumber //页数
     ) {
         int pageNum;
+
+        if(page == null)
+            return new Result<Data>(CodeEnum.noPage.getCode(),CodeEnum.noPage.toString(),new Data());
         try {
             pageNum = Integer.parseInt(page);
         }
-        catch (Exception e){
-            return new Result<Data>(CodeEnum.pageNotInteger.getCode(),CodeEnum.pageNotInteger.toString(),new Data());
+        catch (Exception e) {
+            return new Result<Data>(CodeEnum.pageNotInteger.getCode(), CodeEnum.pageNotInteger.toString(), new Data());
         }
 
         if(pageNum < 1){
@@ -166,6 +166,9 @@ public class AcademicController {
 
         if( ( total +1 ) / 10 + 1 < pageNum )
             return new Result<Data>(CodeEnum.pageOutOfRange.getCode(),CodeEnum.pageOutOfRange.toString(),new Data());
+
+        if(sort == null)
+            return new Result<Data>(CodeEnum.noSort.getCode(),CodeEnum.noSort.toString(),new Data());
 
         Sort.Order order;
         switch (sort){
