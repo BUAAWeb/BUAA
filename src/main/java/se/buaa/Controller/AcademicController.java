@@ -41,16 +41,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.buaa.Dao.ES_DocumentDao;
+import se.buaa.Dao.ES_ExpertDao;
 import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.ESDocument.ES_Document;
+import se.buaa.Entity.ESDocument.ES_Expert;
 import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Response.Result;
+import se.buaa.FontEntity.SearchWords;
 import se.buaa.Repository.ExpertRepository;
 import se.buaa.Service.ES_DocumentService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 //@CrossOrigin
@@ -63,6 +67,9 @@ public class AcademicController {
 
     @Autowired
     ES_DocumentService es_documentService;
+
+    @Autowired
+    ES_ExpertDao es_expertDao;
 
     @RequestMapping("test")
     public Iterable<ES_Document> test(ElasticsearchOperations elasticsearchOperations){
@@ -95,12 +102,30 @@ public class AcademicController {
 //        orderList.add(order1);
         orderList.add(order);
         Sort sort = Sort.by(orderList);
-        PageRequest page = PageRequest.of(0, 100,sort);
+        PageRequest page = PageRequest.of(0, 20,sort);
         Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
         List<ES_Document> documentsList = new ArrayList<>();
         highCitedList.forEach(single ->{documentsList.add(single);});
 //        for(ES_Document es_document : highCitedList){
 //            System.out.println(es_document.getAuthors());
+//        }
+//        for(ES_Document es_document : documentsList){
+//            String experts = es_document.getExperts();
+//            String[] authorNames = experts.split(",");
+//            List<ES_Expert> es_experts = new ArrayList<>();
+//            for(String name : authorNames){
+//                ES_Expert expert = new ES_Expert();
+//                List<ES_Expert> temp =  es_expertDao.findByName(name);
+//                if(temp == null || temp.size() == 0) {
+//                    expert.setName(name);
+//                }
+//                else
+//                    expert = temp.get(0);
+//                es_experts.add(expert);
+//
+//            }
+////        System.out.print("1");
+//            es_document.setAuthors(es_experts);
 //        }
         Data data = new Data();
         data.setResult_list(documentsList);
@@ -110,35 +135,81 @@ public class AcademicController {
 //        else
 //            return new Result<>(400,"error",null);
     }
+
     @RequestMapping("getSearchResult")
-    public Result<SearchResultData> findsearchresult(@RequestParam String kw,//keyword
-                                                          @RequestParam String au,//author
-                                                          @RequestParam("sort") String sortWay, //排序方式
-                                                          @RequestParam("page") Integer pageNumber //页数
+    public Result<Data> getSearchResult(SearchWords searchWords,String sort,String page,String userID
+//            @RequestParam String kw,//keyword
+//                                                         @RequestParam String experts,//author
+//                                                         @RequestParam String origin,
+//                                                         @RequestParam String startTime,
+//                                                         @RequestParam String endTime,
+//                                                         @RequestParam("sort") String sortWay, //排序方式
+//                                                         @RequestParam("page") Integer pageNumber //页数
     ) {
-
-        if(sortWay.compareTo("cited")==0){
-            return new Result<SearchResultData>("200","success");
+        int pageNum;
+        try {
+            pageNum = Integer.parseInt(page);
         }
-        else if(sortWay.compareTo("time")==0){
-            return new Result<SearchResultData>("200","success");
-        }
-        else{
-            Sort.Order order = Sort.Order.desc("cited_quantity");
-            List<Sort.Order> orderList = new ArrayList<>();
-//        orderList.add(order1);
-            orderList.add(order);
-            Sort sort = Sort.by(orderList);
-            PageRequest page = PageRequest.of(0, 10 ,sort);
-            Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
-            List<ES_Document> documentsList = new ArrayList<>();
-            highCitedList.forEach(single ->{documentsList.add(single);});
-            SearchResultData data=new SearchResultData();
-            data.documentList=documentsList;
-            return new Result<SearchResultData>("200","success",data);
+        catch (Exception e){
+            return new Result<Data>(CodeEnum.pageNotInteger.getCode(),CodeEnum.pageNotInteger.toString(),new Data());
         }
 
+        if(pageNum < 1){
+            return new Result<Data>(CodeEnum.pageLessThanOne.getCode(),CodeEnum.pageLessThanOne.toString(),new Data());
+        }
 
+        Sort.Order order;
+        switch (sort){
+            case "cited":
+                order = Sort.Order.desc("cited_quantity");
+                break;
+            case "time":
+                order = Sort.Order.desc("time");
+                break;
+            default:
+                return new Result<Data>(CodeEnum.sortNotFound.getCode(),CodeEnum.sortNotFound.toString(),new Data());
+        }
+        List<Sort.Order> orderList = new ArrayList<>();
+        orderList.add(order);
+        Sort sort1 = Sort.by(orderList);
+        PageRequest page1 = PageRequest.of(pageNum - 1, 10,sort1);
+
+        Iterable<ES_Document> searchResult = es_documentService.
+                findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(page1,
+                        searchWords.getKw(),
+                        searchWords.getExperts(),
+                        searchWords.getOrigin(),
+                        searchWords.getStartTime(),
+                        searchWords.getEndTime());
+
+        Data data = new Data();
+        List<ES_Document> documentsList = new ArrayList<>();
+        searchResult.forEach(single ->{documentsList.add(single);});
+        data.setResult_list(documentsList);
+        data.setTotal(documentsList.size());
+        System.out.println(page1.getPageNumber());
+        return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
+//        data.setTotal();
+//        if(sortWay.compareTo("cited")==0){
+//            return new Result<SearchResultData>("200","success");
+//        }
+//        else if(sortWay.compareTo("time")==0){
+//            return new Result<SearchResultData>("200","success");
+//        }
+//        else{
+//            Sort.Order order = Sort.Order.desc("cited_quantity");
+//            List<Sort.Order> orderList = new ArrayList<>();
+////        orderList.add(order1);
+//            orderList.add(order);
+//            Sort sort = Sort.by(orderList);
+//            PageRequest page = PageRequest.of(0, 10 ,sort);
+//            Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
+//            List<ES_Document> documentsList = new ArrayList<>();
+//            highCitedList.forEach(single ->{documentsList.add(single);});
+//            SearchResultData data=new SearchResultData();
+//            data.documentList=documentsList;
+//            return new Result<SearchResultData>("200","success",data);
+//        }
     }
 //
 //    @RequestMapping("getById")

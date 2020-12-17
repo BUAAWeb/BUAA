@@ -3,12 +3,12 @@ package se.buaa.Service.Impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Service.ES_DocumentService;
 
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -61,10 +61,20 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
         return es_documentList;
     }
 
+    @Override
+    public Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,String keywords, String experts, String origin, String startTime, String endTime) {
+        if(startTime == null)
+            startTime = "0";
+        if(endTime == null)
+            endTime = "2020";
+        return es_documentDao.findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(page,keywords, experts, origin, startTime, endTime);
+    }
+
     public static List removeDuplicate(List list) {
         HashSet h = new HashSet(list);
         list.clear();
         list.addAll(h);
         return list;
     }
+
 }

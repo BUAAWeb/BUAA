@@ -1,9 +1,10 @@
 package se.buaa.Service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import se.buaa.Entity.ESDocument.ES_Document;
 
-import java.awt.print.Pageable;
 import java.util.List;
 
 
@@ -18,4 +19,6 @@ public interface ES_DocumentService {
 
     List<ES_Document> findByKeywords(String keyword);
     List<ES_Document> findByKeywordsLike(List<String> keywords);
+    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
+                                                                          String keywords, String experts, String origin, String startTime, String endTime);
 }

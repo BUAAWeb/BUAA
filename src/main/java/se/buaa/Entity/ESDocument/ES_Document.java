@@ -11,6 +11,7 @@ import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import se.buaa.Dao.ES_ExpertDao;
 import se.buaa.Entity.Expert;
 import se.buaa.Repository.ExpertRepository;
 
@@ -50,15 +51,17 @@ public class ES_Document {
     @Transient
     private List<String> authors = new ArrayList<>();
 
+    @Transient
+    private int views ;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @Autowired
-    ExpertRepository expertRepository;
+    ES_ExpertDao es_expertDao;
 
     @PersistenceConstructor
     public ES_Document(String id, String title, String experts, String keywords, String summary,
                        String link, int cited_quantity, String origin,
-                       String time) throws ParseException {
+                       String time){
         this.documentid = id;
         this.title = title;
         this.experts = experts;
@@ -67,6 +70,8 @@ public class ES_Document {
         this.link = link;
         this.cited_quantity = cited_quantity;
         this.time = time;
+        String[] authorNames = experts.split(",");
+        this.authors.addAll(Arrays.asList(authorNames));
 //        if(time == null)
 //            this.time = null;
 //        else {
@@ -74,14 +79,7 @@ public class ES_Document {
 ////            this.time = new SimpleDateFormat("yyyy-MM-dd").parse(time);
 //        }
         this.origin = origin;
-
-
-        String[] authorNames = experts.split(",");
-//        System.out.print("1");
-        Collections.addAll(authors, authorNames);
-//        for(String name : authorNames){
-//            System.out.println(name);
-//        }
+        this.views = 0;
 //        System.out.println(this.authors);
     }
 

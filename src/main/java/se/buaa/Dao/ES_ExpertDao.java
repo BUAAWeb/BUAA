@@ -10,17 +10,13 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import se.buaa.Entity.ESDocument.ES_Document;
+import se.buaa.Entity.ESDocument.ES_Expert;
 
 import java.util.List;
 
 
 //@NoRepositoryBean
-public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Long> {
-    List<ES_Document> findByKeywordsLike(String keyword);
-    List<ES_Document> findByKeywords(String keyword);
-    List<ES_Document> findByTitleLike(String title);
-    Page<ES_Document> findAll(Pageable page);
-    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLike(Pageable page,String keywords,String experts,String origin);
-    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
-            String keywords,String experts,String origin,String startTime,String endTime);
+public interface  ES_ExpertDao extends ElasticsearchRepository<ES_Expert, Long> {
+    ES_Expert findByExpertid(String id);
+    List<ES_Expert> findByName(String name);
 }
