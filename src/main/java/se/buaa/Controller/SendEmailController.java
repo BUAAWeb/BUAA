@@ -26,12 +26,12 @@ public class SendEmailController {
             return Result.Error("201","邮件发送异常，请联系管理员或重试。");
         }
         Data data = new Data();
-        data.verification = verification;
+        data.verification = Integer.toString(verification);
         return Result.Success(data);
     }
 
     public class Data{
 
-        public int verification;
+        public String verification;
     }
 }

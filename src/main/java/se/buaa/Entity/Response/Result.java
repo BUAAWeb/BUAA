@@ -31,10 +31,17 @@ public class Result<T> implements Serializable {
         return new Result("200", "", data);
     }
 
+    public static Result Success(String msg) {
+        return new Result("200", msg);
+    }
+
     public static Result Error() { return new Result(); }
 
     public static Result Error(String code, String msg) {
         return new Result(code, msg, null);
+    }
+    public static Result Error(String code, String msg,Object data) {
+        return new Result(code, msg, data);
     }
 
     public static Result Error(AbstractException e) {

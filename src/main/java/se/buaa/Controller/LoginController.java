@@ -28,7 +28,7 @@ public class LoginController {
     @RequestMapping("/user/login")
     @ResponseBody
     public Result login(@RequestParam String userName, String passwd){
-         Data data = new Data();
+        Data data = new Data();
         User db_user = userRepository.findByUserName(userName);
         if (db_user!=null&&db_user.passwd.equals(passwd)){
             data.userID = db_user.userID;
@@ -37,16 +37,17 @@ public class LoginController {
             map.put("username",db_user.userName);
             map.put("password",db_user.passwd);
             data.token = JwtUtils.createToken(map);
+
         }
         else {
             data.userID = -1;
-            return Result.Error("201","用户名或密码错误");
+            return Result.Error("201","用户名或密码错误",data);
         }
-        return Result.Success();
+        return Result.Success(data);
     }
     public class Data{
-        int userID=-1;
-        String token;
+        public int userID=-1;
+        public String token;
     }
 }
 
