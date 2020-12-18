@@ -27,4 +27,6 @@ public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Lo
 
     int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(
             String keywords,String experts,String origin,String startTime,String endTime);
+    int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            String keywords,String experts,String origin,String startTime,String endTime,String dType);
 }
