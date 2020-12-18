@@ -44,6 +44,8 @@ public class ES_Document {
     private String link;
     @Field(analyzer = "ik_smart", type = FieldType.Text)//link
     private String origin;
+    @Field(analyzer = "ik_smart", type = FieldType.Integer)//link
+    private int views;
 //    @Field(type = FieldType.Date)//link
 //    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private String time;
@@ -51,8 +53,8 @@ public class ES_Document {
     @Transient
     private List<String> authors = new ArrayList<>();
 
-    @Transient
-    private int views ;
+//    @Transient
+//    private int views ;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @Autowired
