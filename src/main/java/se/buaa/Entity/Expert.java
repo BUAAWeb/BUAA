@@ -18,6 +18,8 @@ public class Expert {
     private int achievements;
     @Column(name = "views")
     private int views;
+    public int isVerified;
+    public int userID;
 
 
     public int getViews() {

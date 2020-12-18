@@ -18,4 +18,5 @@ public class User {
         public String realName;
         public String phoneNum;
         public String url;
+        public String expertID;
 }
