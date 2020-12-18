@@ -84,6 +84,20 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
         origin = origin == null ? "":origin;
         return es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(keywords, experts, origin, startTime, endTime);
     }
+    @Override
+    public int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(String keywords, String experts, String origin, String startTime, String endTime,String dtype) {
+        if(startTime == null || startTime.equals(""))
+            startTime = "0";
+        if(endTime == null || endTime.equals(""))
+            endTime = "2020";
+        keywords = keywords == null ? "":keywords;
+        experts = experts == null ? "":experts;
+        origin = origin == null ? "":origin;
+        if(dtype!=null)
+            return es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(keywords, experts, origin, startTime, endTime,dtype);
+        else
+            return es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(keywords, experts, origin, startTime, endTime);
+    }
 
     public static void handleParams(String keywords, String experts, String origin, String startTime, String endTime){
         if(startTime == null)

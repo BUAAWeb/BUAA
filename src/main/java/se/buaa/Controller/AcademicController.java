@@ -55,6 +55,8 @@ import se.buaa.Repository.CollectionRepository;
 import se.buaa.Repository.ExpertRepository;
 import se.buaa.Service.ES_DocumentService;
 
+import java.net.http.HttpRequest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,7 +65,7 @@ import java.util.Optional;
 
 
 //@CrossOrigin
-@CrossOrigin(allowCredentials="false")
+//@CrossOrigin(allowCredentials="false")
 @RestController
 @RequestMapping("/academic")
 public class AcademicController {
@@ -154,8 +156,13 @@ public class AcademicController {
 //                                                         @RequestParam("sort") String sortWay, //排序方式
 //                                                         @RequestParam("page") Integer pageNumber //页数
     ) {
-        System.out.println(searchWords.getStartTime().equals(""));
+//        System.out.println(searchWords.getStartTime().equals(""));
         int pageNum;
+
+        if(searchWords.getStartTime() == null || searchWords.getStartTime().equals(""))
+            searchWords.setStartTime("0");
+        if(searchWords.getEndTime() == null || searchWords.getEndTime().equals(""))
+            searchWords.setEndTime("2020");
 
         if(searchWords.getStartTime() != null && !Pattern.matches("\\d*",searchWords.getStartTime()))
             return new Result<Data>(CodeEnum.error.getCode(),CodeEnum.error.toString(),new Data());
@@ -185,24 +192,24 @@ public class AcademicController {
         if( ( total +1 ) / 10 + 1 < pageNum )
             return new Result<Data>(CodeEnum.pageOutOfRange.getCode(),CodeEnum.pageOutOfRange.toString(),new Data());
 
-        if(sort == null)
-            return new Result<Data>(CodeEnum.noSort.getCode(),CodeEnum.noSort.toString(),new Data());
+        PageRequest page1;
 
-        Sort.Order order;
-        switch (sort){
-            case "cited":
-                order = Sort.Order.desc("cited_quantity");
-                break;
-            case "time":
-                order = Sort.Order.desc("time");
-                break;
-            default:
-                return new Result<Data>(CodeEnum.sortNotFound.getCode(),CodeEnum.sortNotFound.toString(),new Data());
+        if(sort == null)
+            page1 = PageRequest.of(pageNum - 1, 10);
+        else {
+            Sort.Order order;
+            switch (sort) {
+                case "time":
+                    order = Sort.Order.desc("time");
+                    break;
+                default:
+                    order = Sort.Order.desc("cited_quantity");
+            }
+            List<Sort.Order> orderList = new ArrayList<>();
+            orderList.add(order);
+            Sort sort1 = Sort.by(orderList);
+            page1 = PageRequest.of(pageNum - 1, 10, sort1);
         }
-        List<Sort.Order> orderList = new ArrayList<>();
-        orderList.add(order);
-        Sort sort1 = Sort.by(orderList);
-        PageRequest page1 = PageRequest.of(pageNum - 1, 10,sort1);
 
         Iterable<ES_Document> searchResult = es_documentService.
                 findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(page1,
@@ -215,15 +222,70 @@ public class AcademicController {
         Data data = new Data();
         List<ES_Document> documentsList = new ArrayList<>();
         searchResult.forEach(single ->{documentsList.add(single);});
+        if(userID!=null){
+            int l=documentsList.size();
+            for(int i=0;i<l;i++){
+                String doc_id=documentsList.get(i).getId();
+                CollectionKey ck =new CollectionKey(Integer.parseInt(userID),doc_id);
+                Optional<Collection> res = collectionRepository.findById(ck);
+                if(res.isPresent())
+                {
+                    documentsList.get(i).setIs_favor(true);
+                }
+                else
+                {
+                    documentsList.get(i).setIs_favor(false);
+                }
+            }
+        }
+
         data.setResult_list(documentsList);
         data.setTotal(total);
 
-
+        Filter filter=getTimeFilter(searchWords);
+        data.filter_list.add(filter);
+        filter=getTypeFilter(searchWords);
+        data.filter_list.add(filter);
+        return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
+//        data.setTotal();
+//        if(sortWay.compareTo("cited")==0){
+//            return new Result<SearchResultData>("200","success");
+//        }
+//        else if(sortWay.compareTo("time")==0){
+//            return new Result<SearchResultData>("200","success");
+//        }
+//        else{
+//            Sort.Order order = Sort.Order.desc("cited_quantity");
+//            List<Sort.Order> orderList = new ArrayList<>();
+////        orderList.add(order1);
+//            orderList.add(order);
+//            Sort sort = Sort.by(orderList);
+//            PageRequest page = PageRequest.of(0, 10 ,sort);
+//            Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
+//            List<ES_Document> documentsList = new ArrayList<>();
+//            highCitedList.forEach(single ->{documentsList.add(single);});
+//            SearchResultData data=new SearchResultData();
+//            data.documentList=documentsList;
+//            return new Result<SearchResultData>("200","success",data);
+//        }
+    }
+    private Filter getTimeFilter(SearchWords searchWords){
+        Filter filter=new Filter();
+        filter.filter_name="时间";
+        filter.title="时间";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
         String year=searchWords.getEndTime();
+        if(year==null)
+            year = simpleDateFormat.format(new Date()).substring(0,4);
         year=year.substring(0,4);
+
         String startYear=searchWords.getStartTime();
-        Integer start=Integer.parseInt(startYear);
-        Integer year1=Integer.parseInt(year);
+        Integer start;
+        if(startYear!=null)
+            start=Integer.parseInt(startYear);
+        else
+            start=1970;
+        Integer  year1=Integer.parseInt(year);
         Integer  year2=year1-1;
         Integer  year3=year1-2;
         Integer  year4=year1-5;
@@ -253,9 +315,6 @@ public class AcademicController {
                 searchWords.getOrigin(),
                 year5.toString(),
                 searchWords.getEndTime());
-        Filter filter=new Filter();
-        filter.filter_name="时间";
-        filter.title="时间";
         Filter_Item filter_item1=new Filter_Item();
         Filter_Item filter_item2=new Filter_Item();
         Filter_Item filter_item3=new Filter_Item();
@@ -272,43 +331,63 @@ public class AcademicController {
         filter_item5.content=year5.toString()+"以来";
         filter_item5.number=count5;
         if(start<=year1)
-        filter.filter_itemList.add(filter_item1);
+            filter.filter_itemList.add(filter_item1);
         if(start<=year2)
-        filter.filter_itemList.add(filter_item2);
+            filter.filter_itemList.add(filter_item2);
         if(start<=year3)
-        filter.filter_itemList.add(filter_item3);
+            filter.filter_itemList.add(filter_item3);
         if(start<=year4)
             filter.filter_itemList.add(filter_item4);
         if(start<=year5)
             filter.filter_itemList.add(filter_item5);
-        data.filter_list.add(filter);
-        return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
-//        data.setTotal();
-//        if(sortWay.compareTo("cited")==0){
-//            return new Result<SearchResultData>("200","success");
-//        }
-//        else if(sortWay.compareTo("time")==0){
-//            return new Result<SearchResultData>("200","success");
-//        }
-//        else{
-//            Sort.Order order = Sort.Order.desc("cited_quantity");
-//            List<Sort.Order> orderList = new ArrayList<>();
-////        orderList.add(order1);
-//            orderList.add(order);
-//            Sort sort = Sort.by(orderList);
-//            PageRequest page = PageRequest.of(0, 10 ,sort);
-//            Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
-//            List<ES_Document> documentsList = new ArrayList<>();
-//            highCitedList.forEach(single ->{documentsList.add(single);});
-//            SearchResultData data=new SearchResultData();
-//            data.documentList=documentsList;
-//            return new Result<SearchResultData>("200","success",data);
-//        }
-
-
-
+        return filter;
     }
-
+    private Filter getTypeFilter(SearchWords searchWords){// TODO: 2020-12-18 filter还没有传并接受
+        Filter filter=new Filter();
+        filter.filter_name="种类";
+        filter.title="种类";
+        int count1=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+                searchWords.getOrigin(),
+                searchWords.getStartTime(),
+                searchWords.getEndTime(),"期刊");
+        int count2=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+                searchWords.getOrigin(),
+                searchWords.getStartTime(),
+                searchWords.getEndTime(),"学位");
+        int count3=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+                searchWords.getOrigin(),
+                searchWords.getStartTime(),
+                searchWords.getEndTime(),"会议");
+        int count4=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+                searchWords.getOrigin(),
+                searchWords.getStartTime(),
+                searchWords.getEndTime(),"图书");
+        int count5=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+                searchWords.getOrigin(),
+                searchWords.getStartTime(),
+                searchWords.getEndTime(),"专利");
+        Filter_Item filter_item1=new Filter_Item();
+        Filter_Item filter_item2=new Filter_Item();
+        Filter_Item filter_item3=new Filter_Item();
+        Filter_Item filter_item4=new Filter_Item();
+        Filter_Item filter_item5=new Filter_Item();
+        filter_item1.content="期刊";
+        filter_item1.number=count1;
+        filter_item2.content="学位";
+        filter_item2.number=count2;
+        filter_item3.content="会议";
+        filter_item3.number=count3;
+        filter_item4.content="图书";
+        filter_item4.number=count4;
+        filter_item5.content="专利";
+        filter_item5.number=count5;
+        filter.filter_itemList.add(filter_item1);
+        filter.filter_itemList.add(filter_item2);
+        filter.filter_itemList.add(filter_item3);
+        filter.filter_itemList.add(filter_item4);
+        filter.filter_itemList.add(filter_item5);
+        return filter;
+    }
     @RequestMapping("getById")
     public Result<ES_Document> getById(String id){
         if(id == null)
@@ -316,8 +395,11 @@ public class AcademicController {
         ES_Document es_document = es_documentDao.findByDocumentid(id);
         if(es_document == null)
             return new Result<>(CodeEnum.documentNotExist.getCode(), CodeEnum.documentNotExist.toString(),null);
-        else
+        else{
+
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
+        }
+
     }
 
     @GetMapping("favorSc")

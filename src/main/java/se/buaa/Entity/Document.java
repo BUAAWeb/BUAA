@@ -26,7 +26,8 @@ public class Document {
     private String first_author;
     @Column(name = "date")
     private String date;
-
+    @Column(name = "view")
+    private int view;
     @Transient  //<-非数据库字段
     private List<Expert> expertList ;
 

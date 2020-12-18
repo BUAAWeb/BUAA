@@ -13,7 +13,7 @@ public class BuaaApplication {
         SpringApplication.run(BuaaApplication.class, args);
 
         /* 初始化xml文件定义的错误类型码 */
-        ErrorDict.getInstance();
+        //ErrorDict.getInstance();
     }
 //注释
 }
