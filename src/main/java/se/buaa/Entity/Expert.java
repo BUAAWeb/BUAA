@@ -1,6 +1,8 @@
 package se.buaa.Entity;
 
 
+import org.springframework.data.relational.core.sql.In;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,14 +15,23 @@ public class Expert {
     @Column(name = "org", length = 100)
     private String org;
     @Column(name = "cited_times")
-    private int cited_Times;
+    private Integer cited_Times;
     @Column(name = "achievements")//成果数
     private int achievements;
     @Column(name = "views")
-    private int views;
-    public int isVerified;
-    public int userID;
+    private Integer views;
+    @Column(name = "is_verified")
+    public Integer isVerified;
+    public Integer is_focus;
+    public Integer userID;
 
+    public Integer getIsVerified() {
+        return isVerified;
+    }
+
+    public void setIsVerified(Integer isVerified) {
+        this.isVerified = isVerified;
+    }
 
     public int getViews() {
         return views;

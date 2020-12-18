@@ -2,9 +2,17 @@ package se.buaa.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import se.buaa.Entity.Data.FollowedExpertInfo;
+import se.buaa.Entity.Expert;
 import se.buaa.Entity.Response.Result;
 import se.buaa.Entity.User;
+import se.buaa.Entity.User_Expert;
+import se.buaa.Repository.ExpertRepository;
 import se.buaa.Repository.UserRepository;
+import se.buaa.Repository.User_ExpertRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //this class maps four request:/user/getPerInfo, /user/changeInfo, /user/changeImg and /user/changePasswd,
 //which relates to personInfo
@@ -13,6 +21,10 @@ import se.buaa.Repository.UserRepository;
 public class PerInfo {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ExpertRepository expertRepository;
+    @Autowired
+    User_ExpertRepository user_expertRepository;
 
     @RequestMapping("/user/getPerInfo")
     @ResponseBody
@@ -65,7 +77,7 @@ public class PerInfo {
 
     @RequestMapping("/user/changePasswd")
     @ResponseBody
-    public Result changeImg(@RequestParam int userID, String oldPasswd,String newPasswd){
+    public Result changePassword(@RequestParam int userID, String oldPasswd,String newPasswd){
         User user = userRepository.findByUserID(userID);
         if (user == null){
             return Result.Error("201","用户不存在");
@@ -79,6 +91,22 @@ public class PerInfo {
             return Result.Success("修改成功！");
         }
     }
+
+    @RequestMapping("/user/getFollowList")
+    @ResponseBody
+    public Result getFollowList(@RequestParam int userid) {
+        List<User_Expert> ueList = user_expertRepository.findByUserId(userid);
+        List<FollowedExpertInfo> list = new ArrayList<>();
+
+        for (User_Expert ue : ueList) {
+            Expert e = expertRepository.findByExpertID(ue.expertId);
+            list.add(new FollowedExpertInfo(e.getExpertID(), e.getName()));
+        }
+
+        return Result.Success(list);
+    }
+
+
     public class Data{
         public String userName;
         public String realName;

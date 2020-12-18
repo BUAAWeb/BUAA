@@ -17,11 +17,11 @@ public class Document {
     @Column(name = "summary",length = 1000)//摘要
     private String summary;
     @Column(name = "citedQuantity")//被引次数
-    private int citedQuantity;
+    private Integer citedQuantity;
     @Column(name = "link")//link
     private String link;
     @Column(name = "document_type")
-    private int document_type;
+    private Integer document_type;
     @Column(name = "first_author")
     private String first_author;
     @Column(name = "date")

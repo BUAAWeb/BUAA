@@ -12,9 +12,9 @@ public class User {
         public String userName;
         public String passwd;
         public String email;
-        public int isBanned;
-        public int isVerified;
-        public int isAdmin;
+        public Integer isBanned;
+        public Integer isVerified;
+        public Integer isAdmin;
         public String realName;
         public String phoneNum;
         public String url;

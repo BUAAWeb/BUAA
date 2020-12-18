@@ -20,9 +20,10 @@ public class LoginController {
     @Autowired
     ExpertRepository expertRepository;
 
-    @RequestMapping("PostLoad Test")
-    public void test(){
+    @GetMapping("/expert/test")
+    public Result test(){
         Expert expert = expertRepository.findByExpertID("2");
+        return Result.Success(expert);
     }
 
     @RequestMapping("/user/login")
