@@ -63,7 +63,7 @@ import java.util.Optional;
 
 
 //@CrossOrigin
-@CrossOrigin(allowCredentials="false")
+//@CrossOrigin(allowCredentials="false")
 @RestController
 @RequestMapping("/academic")
 public class AcademicController {
@@ -154,8 +154,13 @@ public class AcademicController {
 //                                                         @RequestParam("sort") String sortWay, //排序方式
 //                                                         @RequestParam("page") Integer pageNumber //页数
     ) {
-        System.out.println(searchWords.getStartTime().equals(""));
+//        System.out.println(searchWords.getStartTime().equals(""));
         int pageNum;
+
+        if(searchWords.getStartTime() == null || searchWords.getStartTime().equals(""))
+            searchWords.setStartTime("0");
+        if(searchWords.getEndTime() == null || searchWords.getEndTime().equals(""))
+            searchWords.setEndTime("2020");
 
         if(searchWords.getStartTime() != null && !Pattern.matches("\\d*",searchWords.getStartTime()))
             return new Result<Data>(CodeEnum.error.getCode(),CodeEnum.error.toString(),new Data());
@@ -185,24 +190,24 @@ public class AcademicController {
         if( ( total +1 ) / 10 + 1 < pageNum )
             return new Result<Data>(CodeEnum.pageOutOfRange.getCode(),CodeEnum.pageOutOfRange.toString(),new Data());
 
-        if(sort == null)
-            return new Result<Data>(CodeEnum.noSort.getCode(),CodeEnum.noSort.toString(),new Data());
+        PageRequest page1;
 
-        Sort.Order order;
-        switch (sort){
-            case "cited":
-                order = Sort.Order.desc("cited_quantity");
-                break;
-            case "time":
-                order = Sort.Order.desc("time");
-                break;
-            default:
-                return new Result<Data>(CodeEnum.sortNotFound.getCode(),CodeEnum.sortNotFound.toString(),new Data());
+        if(sort == null)
+            page1 = PageRequest.of(pageNum - 1, 10);
+        else {
+            Sort.Order order;
+            switch (sort) {
+                case "time":
+                    order = Sort.Order.desc("time");
+                    break;
+                default:
+                    order = Sort.Order.desc("cited_quantity");
+            }
+            List<Sort.Order> orderList = new ArrayList<>();
+            orderList.add(order);
+            Sort sort1 = Sort.by(orderList);
+            page1 = PageRequest.of(pageNum - 1, 10, sort1);
         }
-        List<Sort.Order> orderList = new ArrayList<>();
-        orderList.add(order);
-        Sort sort1 = Sort.by(orderList);
-        PageRequest page1 = PageRequest.of(pageNum - 1, 10,sort1);
 
         Iterable<ES_Document> searchResult = es_documentService.
                 findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(page1,
