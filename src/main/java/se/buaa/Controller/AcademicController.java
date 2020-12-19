@@ -179,7 +179,7 @@ public class AcademicController {
 //        System.out.println(search_word.getStartTime().equals(""));
         int pageNum;
 //        System.out.println("kw:" + kw);
-        System.out.println(post.toString());
+//        System.out.println(post.toString());
         SearchWords search_word = post.getSearch_words();
         String page = post.getPage();
         String sort = post.getSort();
