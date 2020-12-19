@@ -31,7 +31,13 @@ public class ErrorDict {
     }
 
     public void load() throws Exception{
-        File xmlFile = new File("src/main/resources/ErrorConfig.xml");
+        File xmlFile;
+
+        if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")) {
+            xmlFile = new File("src\\main\\resources\\ErrorConfig.xml");
+        }
+        else xmlFile = new File("src/main/resources/ErrorConfig.xml");
+
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         Document doc = builder.parse(xmlFile);
@@ -69,15 +75,14 @@ public class ErrorDict {
         return instance.dict.get(code);
     }
 
-    /** 测试
     public void show() {
         System.out.println(dict);
     }
 
-    public static void main(String[] args) throws Exception {
-        ErrorDict dict = new ErrorDict();
-        dict.load();
-        dict.show();
-    }
-    */
+//    public static void main(String[] args) throws Exception {
+//        ErrorDict dict = new ErrorDict();
+//        System.out.println(System.getProperty("os.name"));
+//        dict.load();
+//        dict.show();
+//    }
 }

@@ -23,4 +23,6 @@ public interface ES_DocumentService {
                                                                           String keywords, String experts, String origin, String startTime, String endTime);
     int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(
             String keywords,String experts,String origin,String startTime,String endTime);
+    int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            String keywords,String experts,String origin,String startTime,String endTime,String dType);
 }

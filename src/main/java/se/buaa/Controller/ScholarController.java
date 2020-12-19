@@ -3,6 +3,7 @@ package se.buaa.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.*;
 import se.buaa.Entity.Data.Achievement;
@@ -11,10 +12,12 @@ import se.buaa.Entity.Document;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Relation.Document_Expert;
 import se.buaa.Entity.Response.Result;
+import se.buaa.Entity.User_Expert;
 import se.buaa.Exception.ScholarException;
 import se.buaa.Repository.Docu_ExpertRepository;
 import se.buaa.Repository.DocumentRepository;
 import se.buaa.Repository.ExpertRepository;
+import se.buaa.Repository.User_ExpertRepository;
 
 import java.util.*;
 
@@ -22,15 +25,18 @@ import java.util.*;
 @RestController
 @RequestMapping("/scholar")
 public class ScholarController {
+
     @Autowired
     ExpertRepository expertRepository;
     @Autowired
     Docu_ExpertRepository docu_expertRepository;
     @Autowired
     DocumentRepository documentRepository;
+    @Autowired
+    User_ExpertRepository user_expertRepository;
 
 
-    @GetMapping("/getCoAuthors")
+    @RequestMapping("/getCoAuthors")
     public Result getcoAuthors(@RequestParam("scholar_id") String scholar_id){
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
 
@@ -92,7 +98,7 @@ public class ScholarController {
     }
 
 
-    @GetMapping("/getCoAffiliate")
+    @RequestMapping("/getCoAffiliate")
     public Result getcoAffiliate(@RequestParam("scholar_id") String scholar_id) {
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
 //        ExampleMatcher matcher = ExampleMatcher.matching()
@@ -163,7 +169,7 @@ public class ScholarController {
 
     /** 获取科研人员相关信息 */
     @PostMapping("/getInfo")
-    public Result getScholarInfo(@RequestParam(value = "scholar_id", required = true) String scholar_id) {
+    public Result getScholarInfo(@RequestParam(value = "user_id") Integer user_id, @RequestParam(value = "scholar_id") String scholar_id) {
         Expert expert = expertRepository.findByExpertID(scholar_id);
 
         // 错误处理，类型码在 ErrorConfig.xml 文件中，类型码要和创建的 Exception 类关联
@@ -176,6 +182,7 @@ public class ScholarController {
         scholarInfo.volume = expert.getViews();
         scholarInfo.scholar_id = expert.getExpertID();
         scholarInfo.affiliate = expert.getOrg();
+        scholarInfo.isVerified = expert.getIsVerified() == 1;
 
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
@@ -186,10 +193,15 @@ public class ScholarController {
         List<Document_Expert> exp_docs = docu_expertRepository.findAll(example);
 
         int size = Math.min(exp_docs.size(), 4);
+
         for (int i = 0; i < size; i++) {
             Document doc = documentRepository.findByDocumentID(exp_docs.get(i).getDocumentID());
             scholarInfo.achList.add(new Achievement(doc.getTitle(), doc.getCitedQuantity()));
         }
+
+        List<User_Expert> list = user_expertRepository.findByUserIdAndExpertId(user_id, scholar_id);
+
+        scholarInfo.isFocus = list.size() != 0;
 
         return Result.Success(scholarInfo);
     }
@@ -288,11 +300,21 @@ public class ScholarController {
 //    }
 
     /** 关注、取消关注 */
-    @GetMapping("/focusScholar")
+    @RequestMapping("/focusScholar")
     @ResponseBody
-    public Result focusScholar(@RequestParam(value = "scholar_id", required = true) String scholar_id
-                            , @RequestParam(value = "user_id", required = true) String user_id) {
-        return Result.Success();
+    public Result focusScholar(@RequestParam(value = "scholar_id") String scholar_id
+                            , @RequestParam(value = "user_id") int user_id) {
+        List<User_Expert> list = user_expertRepository.findByUserIdAndExpertId(user_id, scholar_id);
+
+        if (list.size() == 0) {
+            User_Expert ue = new User_Expert(user_id, scholar_id);
+            user_expertRepository.save(ue);
+            return Result.Success(true);
+        }
+        else {
+            user_expertRepository.delete(list.get(0));
+            return Result.Success(false);
+        }
     }
 
 }
