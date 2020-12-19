@@ -57,9 +57,7 @@ import se.buaa.Service.ES_DocumentService;
 
 import java.net.http.HttpRequest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -186,6 +184,10 @@ public class AcademicController {
         SearchWords search_word = post.getSearch_words();
         String page = post.getPage();
         String sort = post.getSort();
+        String userID = post.getUserID();
+        System.out.println(
+                post.toString()
+        );
 //
 
 //        Enumeration enu=request.getParameterNames();
@@ -303,9 +305,9 @@ public class AcademicController {
         data.setTotal(total);
 
         String year=search_word.getEndTime();
-        Filter filter=getTimeFilter(searchWords);
+        Filter filter=getTimeFilter(search_word);
         data.filter_list.add(filter);
-        filter=getTypeFilter(searchWords);
+        filter=getTypeFilter(search_word);
         data.filter_list.add(filter);
         return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
 //        data.setTotal();
@@ -339,12 +341,9 @@ public class AcademicController {
         if(year==null)
             year = simpleDateFormat.format(new Date()).substring(0,4);
         year=year.substring(0,4);
-        String startYear=search_word.getStartTime();
-        Integer start=Integer.parseInt(startYear);
-        Integer year1=Integer.parseInt(year);
-
         String startYear=searchWords.getStartTime();
-        Integer start;
+        Integer start=Integer.parseInt(startYear);
+
         if(startYear!=null)
             start=Integer.parseInt(startYear);
         else
@@ -354,34 +353,30 @@ public class AcademicController {
         Integer  year3=year1-2;
         Integer  year4=year1-5;
         Integer  year5=year1-10;
-        int count1 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(search_word.getKw(),
-                search_word.getExperts(),
-                search_word.getOrigin(),
+        int count1 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
                 year1.toString(),
-                search_word.getEndTime());
-        int count2 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(search_word.getKw(),
-                search_word.getExperts(),
-                search_word.getOrigin(),
+                searchWords.getEndTime());
+        int count2 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
                 year2.toString(),
-                search_word.getEndTime());
-        int count3 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(search_word.getKw(),
-                search_word.getExperts(),
-                search_word.getOrigin(),
+                searchWords.getEndTime());
+        int count3 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
                 year3.toString(),
-                search_word.getEndTime());
-        int count4 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(search_word.getKw(),
-                search_word.getExperts(),
-                search_word.getOrigin(),
+                searchWords.getEndTime());
+        int count4 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
                 year4.toString(),
-                search_word.getEndTime());
-        int count5 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(search_word.getKw(),
-                search_word.getExperts(),
-                search_word.getOrigin(),
+                searchWords.getEndTime());
+        int count5 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+                searchWords.getExperts(),
+                searchWords.getOrigin(),
                 year5.toString(),
-                search_word.getEndTime());
-        Filter filter=new Filter();
-        filter.filter_name="时间";
-        filter.title="时间";
                 searchWords.getEndTime());
         Filter_Item filter_item1=new Filter_Item();
         Filter_Item filter_item2=new Filter_Item();
