@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import se.buaa.Config.JwtUtils;
 import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.ApplicationForm;
-import se.buaa.Entity.Document;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Relation.Document_Expert;
@@ -68,7 +67,7 @@ public class ApplicationController {
             if (user.isVerified!=1){
                 return Result.Error("201","请先认领门户后再进行认领文献操作！");
             }
-            applicationForm.objectName = documentRepository.findDocumentByDocumentID(request.objectID).getTitle();
+            applicationForm.objectName = es_document.getTitle();
         }
         else return Result.Error("201","flag参数错误");
         Date date = new Date();
