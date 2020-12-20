@@ -18,11 +18,11 @@ public interface ES_DocumentService {
     List<ES_Document> findByTitle(String title);
 
     List<ES_Document> findByKeywords(String keyword);
-    List<ES_Document> findByKeywordsLike(List<String> keywords);
-    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
+    List<ES_Document> findByKeywordsIn(List<String> keywords);
+    Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
                                                                                   String keywords, String experts, String origin, String startTime, String endTime);
-    int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(
+    int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
             String keywords,String experts,String origin,String startTime,String endTime);
-    int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+    int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
             String keywords,String experts,String origin,String startTime,String endTime,String dType);
 }

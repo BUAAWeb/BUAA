@@ -13,6 +13,7 @@ package se.buaa.Controller;
 //415 （unsupported media type）- 接受到的表示不受支持
 //500 （internal server error）- 通用错误响应
 //503 （Service Unavailable）- 服务当前无法处理请求
+import org.apache.commons.collections.IteratorUtils;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -190,6 +191,35 @@ public class AcademicController {
         return new Result("200", CodeEnum.success.toString(), data);
 
     }
+    @RequestMapping("getKeyword")
+    public Result<Data> getKeyword(String keyword,int pageNumber) {
+        Date date1=new Date();
+        Sort.Order order = Sort.Order.desc("cited");
+
+        List<Sort.Order> orderList = new ArrayList<>();
+//        orderList.add(order1);
+        orderList.add(order);
+        Sort sort = Sort.by(orderList);
+
+        if(keyword==null)
+            return new Result("308", CodeEnum.error.toString());
+
+        PageRequest page= PageRequest.of(pageNumber-1,10);
+        List<ES_Document> documentsList = new ArrayList<>();
+        Iterable<ES_Document> highCitedList = es_documentDao.findByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
+                page,keyword,keyword,keyword,"","","1970","2020"
+        );
+        highCitedList.forEach(single ->{documentsList.add(single);});
+
+        Data data = new Data();
+        data.total=es_documentDao.countByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
+                keyword,keyword,keyword,"","","1970","2020");
+
+        Date date2=new Date();
+        data.time= (int) (date2.getTime( )-date1.getTime());
+        return new Result("200", CodeEnum.success.toString(), data);
+
+    }
     private List<ES_Document> clean(List<ES_Document> es_documents,String experts) {
         boolean k=false;
         int l=es_documents.size();
@@ -297,7 +327,7 @@ public class AcademicController {
             return new Result<Data>(CodeEnum.pageLessThanOne.getCode(),CodeEnum.pageLessThanOne.toString(),new Data());
         }
 
-        int total = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(search_word.getKw(),
+        int total = es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(search_word.getKw(),
                 search_word.getExperts(),
                 search_word.getOrigin(),
                 search_word.getStartTime(),
@@ -329,11 +359,15 @@ public class AcademicController {
             List<Sort.Order> orderList = new ArrayList<>();
             orderList.add(order);
             Sort sort1 = Sort.by(orderList);
-            page1 = PageRequest.of(pageNum - 1, 10, sort1);
+            //page1 = PageRequest.of(pageNum - 1, 10, sort1);
+            page1 = PageRequest.of(pageNum - 1, 10);
         }
-
-        Iterable<ES_Document> searchResult = es_documentService.
-                findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(page1,
+        if(search_word.getExperts()==null)
+            search_word.setExperts("");
+        Iterable<ES_Document> searchResult = es_documentDao.
+                findByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(page1,
+                        search_word.getKw(),
+                        search_word.getKw(),
                         search_word.getKw(),
                         search_word.getExperts(),
                         search_word.getOrigin(),
@@ -393,7 +427,7 @@ public class AcademicController {
     }
     private Filter getTimeFilter(SearchWords searchWords){
         Filter filter=new Filter();
-        filter.filter_name="时间";
+        filter.filter_name="year";
         filter.title="时间";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
         String year=searchWords.getEndTime();
@@ -412,27 +446,27 @@ public class AcademicController {
         Integer  year3=year1-2;
         Integer  year4=year1-5;
         Integer  year5=year1-10;
-        int count1 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+        int count1 = es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
                 searchWords.getExperts(),
                 searchWords.getOrigin(),
                 year1.toString(),
                 searchWords.getEndTime());
-        int count2 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+        int count2 = es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
                 searchWords.getExperts(),
                 searchWords.getOrigin(),
                 year2.toString(),
                 searchWords.getEndTime());
-        int count3 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+        int count3 = es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
                 searchWords.getExperts(),
                 searchWords.getOrigin(),
                 year3.toString(),
                 searchWords.getEndTime());
-        int count4 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+        int count4 = es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
                 searchWords.getExperts(),
                 searchWords.getOrigin(),
                 year4.toString(),
                 searchWords.getEndTime());
-        int count5 = es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
+        int count5 = es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(searchWords.getKw(),
                 searchWords.getExperts(),
                 searchWords.getOrigin(),
                 year5.toString(),
@@ -443,15 +477,15 @@ public class AcademicController {
         Filter_Item filter_item4=new Filter_Item();
         Filter_Item filter_item5=new Filter_Item();
         filter_item1.content=year1.toString()+"以来";
-        filter_item1.number=count1;
+        filter_item1.count=count1;
         filter_item2.content=year2.toString()+"以来";
-        filter_item2.number=count2;
+        filter_item2.count=count2;
         filter_item3.content=year3.toString()+"以来";
-        filter_item3.number=count3;
+        filter_item3.count=count3;
         filter_item4.content=year4.toString()+"以来";
-        filter_item4.number=count4;
+        filter_item4.count=count4;
         filter_item5.content=year5.toString()+"以来";
-        filter_item5.number=count5;
+        filter_item5.count=count5;
         if(start<=year1)
             filter.filter_itemList.add(filter_item1);
         if(start<=year2)
@@ -466,25 +500,25 @@ public class AcademicController {
     }
     private Filter getTypeFilter(SearchWords searchWords){// TODO: 2020-12-18 filter还没有传并接受
         Filter filter=new Filter();
-        filter.filter_name="种类";
+        filter.filter_name="type";
         filter.title="种类";
-        int count1=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+        int count1=es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
                 searchWords.getOrigin(),
                 searchWords.getStartTime(),
                 searchWords.getEndTime(),"期刊");
-        int count2=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+        int count2=es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
                 searchWords.getOrigin(),
                 searchWords.getStartTime(),
                 searchWords.getEndTime(),"学位");
-        int count3=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+        int count3=es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
                 searchWords.getOrigin(),
                 searchWords.getStartTime(),
                 searchWords.getEndTime(),"会议");
-        int count4=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+        int count4=es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
                 searchWords.getOrigin(),
                 searchWords.getStartTime(),
                 searchWords.getEndTime(),"图书");
-        int count5=es_documentService.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
+        int count5=es_documentService.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(searchWords.getKw(),searchWords.getExperts(),
                 searchWords.getOrigin(),
                 searchWords.getStartTime(),
                 searchWords.getEndTime(),"专利");
@@ -494,15 +528,15 @@ public class AcademicController {
         Filter_Item filter_item4=new Filter_Item();
         Filter_Item filter_item5=new Filter_Item();
         filter_item1.content="期刊";
-        filter_item1.number=count1;
+        filter_item1.count=count1;
         filter_item2.content="学位";
-        filter_item2.number=count2;
+        filter_item2.count=count2;
         filter_item3.content="会议";
-        filter_item3.number=count3;
+        filter_item3.count=count3;
         filter_item4.content="图书";
-        filter_item4.number=count4;
+        filter_item4.count=count4;
         filter_item5.content="专利";
-        filter_item5.number=count5;
+        filter_item5.count=count5;
         filter.filter_itemList.add(filter_item1);
         filter.filter_itemList.add(filter_item2);
         filter.filter_itemList.add(filter_item3);

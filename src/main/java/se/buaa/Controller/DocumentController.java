@@ -38,11 +38,11 @@ public class DocumentController {
         return es_documentService.findAll(page);
     }
 
-    @RequestMapping("findByKeywordsLike")
-    public Iterable<ES_Document> findByKeywordsLike(String keywords) {
+    @RequestMapping("findByKeywordsIn")
+    public Iterable<ES_Document> findByKeywordsIn(String keywords) {
         List<String> keyword = new ArrayList<String>();
         keyword.add(keywords);
-         return es_documentService.findByKeywordsLike(keyword);
+         return es_documentService.findByKeywordsIn(keyword);
     }
 
 //    @RequestMapping("findByKeywords")

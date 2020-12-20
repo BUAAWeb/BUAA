@@ -61,14 +61,18 @@ public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Lo
     List<ES_Document> findByKeywords(String keyword);
     List<ES_Document> findByTitleLike(String title);
     Page<ES_Document> findAll(Pageable page);
+    List<ES_Document> findByKeywordsIn(String keywords);
     Page<ES_Document> findByExpertsIn(Pageable page,List<String> experts);
+    Page<ES_Document> findByKeywordsIn(Pageable page,String keywords);
     List<ES_Document> findByExpertsIn(List<String> experts);
-    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLike(Pageable page,String keywords,String experts,String origin);
-    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
-                                                                                  String keywords,String experts,String origin,String startTime,String endTime);
+    Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLike(Pageable page,String keywords,String experts,String origin);
+    Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page, String keywords,String experts,String origin,String startTime,String endTime);
+    Page<ES_Document> findByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,String title,String summary,String keywords,String experts,String origin,String startTime,String endTime);
     int countByExpertsIn(String experts);
-    int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(
+    int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
             String keywords,String experts,String origin,String startTime,String endTime);
-    int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+    int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
             String keywords,String experts,String origin,String startTime,String endTime,String dType);
+    int countByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
+            String title,String summary,String keywords,String experts,String origin,String startTime,String endTime);
 }
