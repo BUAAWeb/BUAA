@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Data
-@Document(indexName = "document",indexStoreType = "doc")
+@Document(indexName = "document1",indexStoreType = "doc")
 public class ES_Document {
     @Id
     private String id;
@@ -108,9 +108,6 @@ public class ES_Document {
         this.views = views;
     }
 
-    public void setEs_expertDao(ES_ExpertDao es_expertDao) {
-        this.es_expertDao = es_expertDao;
-    }
 
     public String getId() {
         return id;
@@ -164,25 +161,17 @@ public class ES_Document {
         return views;
     }
 
-    public ES_ExpertDao getEs_expertDao() {
-        return es_expertDao;
-    }
+//    @Field(analyzer = "ik_smart")
     @Transient
     private List<ES_Expert> authors = new ArrayList<>();
+//    @Field(analyzer = "ik_smart")
     @Transient
     private List<String> keywordList = new ArrayList<>();
-
-//    @Transient
-//    private int views ;
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    @Autowired
-    ES_ExpertDao es_expertDao;
 
     @PersistenceConstructor
     public ES_Document(String dtype,String id, String title, String experts, String keywords, String summary,
                        String link, int cited_quantity, String origin,
-                       String time){
+                       String time,List<String> keywordList,List<ES_Expert> authors ){
         this.documentid = id;
         this.title = title;
         this.experts = experts;
@@ -192,6 +181,8 @@ public class ES_Document {
         this.cited_quantity = cited_quantity;
         this.time = time;
         this.dtype = dtype;
+        this.keywordList = keywordList;
+        this.authors = authors;
         String[] authorNames = experts.split(",");
         this.authors = new ArrayList<>();
         for(String author : authorNames){

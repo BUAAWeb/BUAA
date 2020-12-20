@@ -81,11 +81,14 @@ public class AcademicController {
     @RequestMapping("test")
     public void test(){
         long total = es_documentDao.count();
-        for(int i = 0;i <= (total+1)/2000 ;i++){
-            PageRequest page = PageRequest.of(i, 2000);
+        System.out.println("total: " + total);
+        for(int i = 0;i <= 10 ;i++){
+            PageRequest page = PageRequest.of(i, 100);
             Iterable<ES_Document> highCitedList = es_documentDao.findAll(page);
+            System.out.println("page:" + i + 1);
             for(ES_Document es_document : highCitedList) {
-                es_document.setViews(0);
+                System.out.println(es_document.toString());
+//                es_document.setViews(0);
                 es_documentDao.save(es_document);
             }
         }
