@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Data
-@Document(indexName = "document",indexStoreType = "doc")
+@Document(indexName = "document1",indexStoreType = "doc")
 public class ES_Document {
     @Id
     private String id;
