@@ -46,7 +46,7 @@ public class JwtUtils {
      */
     public static int verifyToken(String token) {
         try {
-            Jwts.parser().setSigningKey(generateKey()).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(generateKey()).parseClaimsJwt(token);
             return 0;
         } catch (ExpiredJwtException e) {
             e.printStackTrace();

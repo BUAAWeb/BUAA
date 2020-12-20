@@ -18,4 +18,5 @@ public class CollectionKey implements Serializable{
     private Integer userid;
     @Column(name="documentid")
     private String documentid;
+
 }

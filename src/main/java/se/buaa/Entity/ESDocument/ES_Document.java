@@ -33,7 +33,7 @@ public class ES_Document {
     private String dtype;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @Field(analyzer = "ik_smart", type = FieldType.Text)
+    @Field(analyzer = "ik_smart",type = FieldType.Text)
     private String experts;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String keywords;
@@ -173,6 +173,8 @@ public class ES_Document {
     }
     @Transient
     private List<String> authors = new ArrayList<>();
+    @Transient
+    private List<String> keywordList = new ArrayList<>();
 
 //    @Transient
 //    private int views ;
@@ -196,6 +198,8 @@ public class ES_Document {
         this.dtype = dtype;
         String[] authorNames = experts.split(",");
         this.authors.addAll(Arrays.asList(authorNames));
+        String[] keyword = experts.split(",");
+        this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)
 //            this.time = null;
 //        else {

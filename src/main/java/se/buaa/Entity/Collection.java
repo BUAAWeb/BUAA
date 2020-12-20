@@ -17,5 +17,7 @@ import javax.persistence.Table;
 public class Collection {
     @EmbeddedId
     private CollectionKey collectionKey;
+
+
 }
 
