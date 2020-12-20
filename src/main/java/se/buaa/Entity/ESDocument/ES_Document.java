@@ -104,10 +104,6 @@ public class ES_Document {
         this.is_favor = is_favor;
     }
 
-    public void setAuthors(List<String> authors) {
-        this.authors = authors;
-    }
-
     public void setViews(int views) {
         this.views = views;
     }
@@ -160,7 +156,7 @@ public class ES_Document {
         return is_favor;
     }
 
-    public List<String> getAuthors() {
+    public List<ES_Expert> getAuthors() {
         return authors;
     }
 
@@ -172,7 +168,7 @@ public class ES_Document {
         return es_expertDao;
     }
     @Transient
-    private List<String> authors = new ArrayList<>();
+    private List<ES_Expert> authors = new ArrayList<>();
     @Transient
     private List<String> keywordList = new ArrayList<>();
 
@@ -197,7 +193,12 @@ public class ES_Document {
         this.time = time;
         this.dtype = dtype;
         String[] authorNames = experts.split(",");
-        this.authors.addAll(Arrays.asList(authorNames));
+        this.authors = new ArrayList<>();
+        for(String author : authorNames){
+            ES_Expert expert = new ES_Expert();
+            expert.setName(author);
+            this.authors.add(expert);
+        }
         String[] keyword = experts.split(",");
         this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)

@@ -193,7 +193,7 @@ public class AcademicController {
             k=false;
             int l2=es_documents.get(i).getAuthors().size();
             for(int j=0;j<l2;j++){
-                if(es_documents.get(i).getAuthors().get(j).compareTo(experts)==0) {
+                if(es_documents.get(i).getAuthors().get(j).getName().compareTo(experts)==0) {
                     k = true;
                     break;
                 }
