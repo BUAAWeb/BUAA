@@ -11,5 +11,6 @@ public interface ApplicationRepository extends JpaRepository<ApplicationForm,Int
     @Override
     ArrayList<ApplicationForm> findAll();
     ArrayList<ApplicationForm> findApplicationFormsByResultIs(int result);
+    ApplicationForm findApplicationFormByUserIDAndObjectID(int userID,String objectID);
     ApplicationForm findApplicationFormByFormID(int id);
 }

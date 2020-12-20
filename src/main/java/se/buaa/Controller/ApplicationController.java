@@ -37,9 +37,12 @@ public class ApplicationController {
     ES_DocumentDao es_documentDao;
 
     @RequestMapping("create")
-    public Result getAll(@RequestBody createReq request){
+    public Result create(@RequestBody createReq request){
         if (JwtUtils.verifyToken(request.token)!=0){
             return Result.Error("201","token非法，请重新登录");
+        }
+        if (applicationRepository.findApplicationFormByUserIDAndObjectID(request.userID,request.objectID)!=null){
+            return Result.Error("201","您的申请正在由管理员审核，请勿重复操作");
         }
         ApplicationForm applicationForm = new ApplicationForm();
         applicationForm.email = request.email;
@@ -83,16 +86,13 @@ public class ApplicationController {
         if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        if (!isAll){
-            list = applicationRepository.findApplicationFormsByResultIs(0);
-            list.removeIf(i -> i.flag != flag);
-        }
-
-        else {
+        list = applicationRepository.findApplicationFormsByResultIs(0);
+        if (isAll){
             list = applicationRepository.findApplicationFormsByResultIs(1);
             list.addAll(applicationRepository.findApplicationFormsByResultIs(2));
-            list.removeIf(i -> i.flag != flag);
         }
+        list.removeIf(i -> i.flag != flag);
+
 
         int list_size = list.size();
         getAllRes data = new getAllRes();
@@ -103,25 +103,25 @@ public class ApplicationController {
         return Result.Success(data);
     }
     @RequestMapping("reject")
-    public Result reject(@RequestBody rejectReq request){
-        if (JwtUtils.verifyToken(request.token)!=0){
+    public Result reject(@RequestParam String token,String reason,int formID){
+        if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        ApplicationForm applicationForm = applicationRepository.findApplicationFormByFormID(request.formID);
+        ApplicationForm applicationForm = applicationRepository.findApplicationFormByFormID(formID);
         if (applicationForm==null){
             return Result.Error("201","表单不存在，请刷新重试");
         }
         applicationForm.result = 2;
-        applicationForm.msg = request.reason;
+        applicationForm.msg = reason;
         applicationRepository.save(applicationForm);
         return Result.Success();
     }
     @RequestMapping("agree")
-    public Result agree(@RequestBody agreeReq request){
-        if (JwtUtils.verifyToken(request.token)!=0){
+    public Result agree(@RequestParam String token,int formID){
+        if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        ApplicationForm applicationForm = applicationRepository.findApplicationFormByFormID(request.formID);
+        ApplicationForm applicationForm = applicationRepository.findApplicationFormByFormID(formID);
         if (applicationForm==null){
             return Result.Error("201","表单不存在，请刷新重试");
         }
@@ -150,6 +150,7 @@ public class ApplicationController {
         }
         else return Result.Error("201","flag参数错误");
         applicationForm.result = 1;
+        applicationRepository.save(applicationForm);
         return Result.Success();
     }
     public static class createReq{
