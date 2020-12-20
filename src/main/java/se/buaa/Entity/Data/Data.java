@@ -11,7 +11,7 @@ public class Data {
     public int total;
     public List<ES_Document> result_list = new ArrayList<>();
     public List<Filter> filter_list = new ArrayList<>();
-
+    public  int time;
     public int getTotal() {
         return total;
     }
