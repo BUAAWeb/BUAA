@@ -152,14 +152,15 @@ public class AcademicController {
 
     }
     @RequestMapping("getExpert")
-    public Result<Data> getExpert(String expertName) {
+    public Result<Data> getExpert(String expertName,int pageNumber) {
+        Date date1=new Date();
         Sort.Order order = Sort.Order.desc("time");
         System.out.println(expertName);
         List<Sort.Order> orderList = new ArrayList<>();
 //        orderList.add(order1);
         orderList.add(order);
         Sort sort = Sort.by(orderList);
-        int pageNumber=0;
+
         if(expertName==null)
             return new Result("308", CodeEnum.error.toString());
         List<String> expertsName=new ArrayList<>();
@@ -170,22 +171,25 @@ public class AcademicController {
         expertsName.add("，"+expertName);
         expertsName.add(","+expertName);
         expertsName.add(expertName);
-        int pageSize=20;
+
 //        Iterable<ES_Document> highCitedList = es_documentDao.findByExpertsLikeAndExperts(page,expertsName,expertName);
 //        List<ES_Document> documentsList = es_documentDao.findByAuthors(page,expertName);
         List<ES_Document> documentsList = new ArrayList<>();
         List<ES_Document> es_documentList = new ArrayList<>();
-        while(documentsList.size()<pageSize){
-            PageRequest page = PageRequest.of(pageNumber, 20,sort);
-            Iterable<ES_Document> highCitedList = es_documentDao.findByExpertsIn(page,expertsName);
-            highCitedList.forEach(single ->{es_documentList.add(single);});
-            documentsList.addAll(clean(es_documentList,expertName));
-            pageNumber++;
-            es_documentList.clear();
-        }
-        documentsList.subList(0,pageSize);
+        es_documentList=es_documentDao.findByExpertsIn(expertsName);
+        documentsList=clean(es_documentList,expertName);
         Data data = new Data();
-        data.setResult_list(documentsList);
+        data.total=documentsList.size();
+        if(data.total<10*pageNumber-10)
+            return new Result("300", CodeEnum.pageOutOfRange.toString(), data);
+        if(data.total<10*pageNumber-1)
+            data.setResult_list(documentsList.subList(10*pageNumber-10,data.total));
+        else
+            data.setResult_list(documentsList.subList(10*pageNumber-10,10*pageNumber-1));
+
+
+        Date date2=new Date();
+        data.time= (int) (date2.getTime( )-date1.getTime());
         return new Result("200", CodeEnum.success.toString(), data);
 
     }
