@@ -146,12 +146,67 @@ public class AcademicController {
         Data data = new Data();
         data.setResult_list(documentsList);
         return new Result("200", CodeEnum.success.toString(), data);
-//        if(highCitedList != null)
-//            return new Result<>(200, "success",highCitedList);
-//        else
-//            return new Result<>(400,"error",null);
-    }
 
+    }
+    @RequestMapping("getExpert")
+    public Result<Data> getExpert(String expertName) {
+        Sort.Order order = Sort.Order.desc("time");
+        System.out.println(expertName);
+        List<Sort.Order> orderList = new ArrayList<>();
+//        orderList.add(order1);
+        orderList.add(order);
+        Sort sort = Sort.by(orderList);
+        int pageNumber=0;
+        if(expertName==null)
+            return new Result("308", CodeEnum.error.toString());
+        List<String> expertsName=new ArrayList<>();
+        expertsName.add("，"+expertName+"，");
+        expertsName.add(","+expertName+",");
+        expertsName.add(expertName+"，");
+        expertsName.add(expertName+",");
+        expertsName.add("，"+expertName);
+        expertsName.add(","+expertName);
+        expertsName.add(expertName);
+        int pageSize=20;
+//        Iterable<ES_Document> highCitedList = es_documentDao.findByExpertsLikeAndExperts(page,expertsName,expertName);
+//        List<ES_Document> documentsList = es_documentDao.findByAuthors(page,expertName);
+        List<ES_Document> documentsList = new ArrayList<>();
+        List<ES_Document> es_documentList = new ArrayList<>();
+        while(documentsList.size()<pageSize){
+            PageRequest page = PageRequest.of(pageNumber, 20,sort);
+            Iterable<ES_Document> highCitedList = es_documentDao.findByExpertsIn(page,expertsName);
+            highCitedList.forEach(single ->{es_documentList.add(single);});
+            documentsList.addAll(clean(es_documentList,expertName));
+            pageNumber++;
+            es_documentList.clear();
+        }
+        documentsList.subList(0,pageSize);
+        Data data = new Data();
+        data.setResult_list(documentsList);
+        return new Result("200", CodeEnum.success.toString(), data);
+
+    }
+    private List<ES_Document> clean(List<ES_Document> es_documents,String experts) {
+        boolean k=false;
+        int l=es_documents.size();
+        for (int i=0;i<l;i++){
+            k=false;
+            int l2=es_documents.get(i).getAuthors().size();
+            for(int j=0;j<l2;j++){
+                if(es_documents.get(i).getAuthors().get(j).compareTo(experts)==0) {
+                    k = true;
+                    break;
+                }
+            }
+            if(k==false){
+                es_documents.remove(i);
+                i--;
+                l--;
+            }
+
+        }
+        return es_documents;
+    }
 
     //{a=1, b=2, c=3} 格式转换成map
     private static Map<String, String> mapStringToMap(String str) {
@@ -452,14 +507,18 @@ public class AcademicController {
         return filter;
     }
     @RequestMapping("getById")
-    public Result<ES_Document> getById(String id){
-        if(id == null)
+    public Result<ES_Document> getById(String document_id,int user_id){
+        if(document_id == null)
             return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
-        ES_Document es_document = es_documentDao.findByDocumentid(id);
+        ES_Document es_document = es_documentDao.findByDocumentid(document_id);
         if(es_document == null)
             return new Result<>(CodeEnum.documentNotExist.getCode(), CodeEnum.documentNotExist.toString(),null);
         else{
-
+            CollectionKey collectionKey=new CollectionKey(user_id,document_id);
+            Optional<Collection> res = collectionRepository.findById(collectionKey);
+            if(res!=null){
+                es_document.setIs_favor(true);
+            }
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
 
