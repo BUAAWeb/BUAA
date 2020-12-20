@@ -195,7 +195,7 @@ public class ScholarController {
         int size = Math.min(exp_docs.size(), 4);
 
         for (int i = 0; i < size; i++) {
-            Document doc = documentRepository.findByDocumentID(exp_docs.get(i).getDocumentID());
+            Document doc = documentRepository.findDocumentByDocumentID(exp_docs.get(i).getDocumentID());
             scholarInfo.achList.add(new Achievement(doc.getTitle(), doc.getCitedQuantity()));
         }
 

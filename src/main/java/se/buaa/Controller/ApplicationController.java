@@ -3,10 +3,13 @@ package se.buaa.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import se.buaa.Config.JwtUtils;
+import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.ApplicationForm;
 import se.buaa.Entity.Document;
+import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Relation.Document_Expert;
 import se.buaa.Entity.Response.Result;
@@ -16,6 +19,7 @@ import se.buaa.Repository.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/application")
@@ -30,6 +34,8 @@ public class ApplicationController {
     ExpertRepository expertRepository;
     @Autowired
     Docu_ExpertRepository docu_expertRepository;
+    @Autowired
+    ES_DocumentDao es_documentDao;
 
     @RequestMapping("create")
     public Result getAll(@RequestBody createReq request){
@@ -39,12 +45,12 @@ public class ApplicationController {
         ApplicationForm applicationForm = new ApplicationForm();
         applicationForm.email = request.email;
         applicationForm.flag = request.flag;
-        applicationForm.objectID = request.ObjectID;
+        applicationForm.objectID = request.objectID;
         applicationForm.userID = request.userID;
         applicationForm.userName = userRepository.findByUserID(request.userID).userName;
         User user = userRepository.findByUserID(applicationForm.userID);
         if (request.flag == 1){//门户
-            Expert expert = expertRepository.findByExpertID(request.ObjectID);
+            Expert expert = expertRepository.findByExpertID(request.objectID);
             if(expert==null)
                 return Result.Error("201","专家不存在");
             if (expert.isVerified==1)
@@ -52,16 +58,17 @@ public class ApplicationController {
             if (user.isVerified==1){
                 return Result.Error("201","您已认领门户，请勿重复认领！");
             }
-            applicationForm.objectName = expertRepository.findByExpertID(request.ObjectID).getName();
+            applicationForm.objectName = expertRepository.findByExpertID(request.objectID).getName();
         }
 
         else if (request.flag==0){
-            if(documentRepository.findByDocumentID(request.ObjectID)==null)
+            ES_Document es_document = es_documentDao.findByDocumentid(request.objectID);
+            if(es_document==null)
                 return Result.Error("201","文献不存在");
             if (user.isVerified!=1){
                 return Result.Error("201","请先认领门户后再进行认领文献操作！");
             }
-            applicationForm.objectName = documentRepository.findByDocumentID(request.ObjectID).getTitle();
+            applicationForm.objectName = documentRepository.findDocumentByDocumentID(request.objectID).getTitle();
         }
         else return Result.Error("201","flag参数错误");
         Date date = new Date();
@@ -69,20 +76,31 @@ public class ApplicationController {
         applicationForm.time = dateFormat.format(date);
         applicationForm.result = 0;
         applicationRepository.save(applicationForm);
-        return Result.Success(null);
+        return Result.Success();
     }
     @RequestMapping("getAll")
-    public Result getAll(@RequestBody getAllReq request){
-        if (JwtUtils.verifyToken(request.token)!=0){
+    public Result getAll(@RequestParam int size,boolean isAll,int flag,String token,int page){
+        ArrayList<ApplicationForm> list;
+        if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        ArrayList<ApplicationForm> list = applicationRepository.findAll();
-        int size = list.size();
+        if (!isAll){
+            list = applicationRepository.findApplicationFormsByResultIs(0);
+            list.removeIf(i -> i.flag != flag);
+        }
+
+        else {
+            list = applicationRepository.findApplicationFormsByResultIs(1);
+            list.addAll(applicationRepository.findApplicationFormsByResultIs(2));
+            list.removeIf(i -> i.flag != flag);
+        }
+
+        int list_size = list.size();
         getAllRes data = new getAllRes();
-        data.totalPages = size/request.size;
-        data.page = request.page;
-        data.totalElements = request.page* request.size>size? request.size : size - request.size;//若为最后一页，则该页长度不是每页的个数request.size
-        data.rows = (ArrayList<ApplicationForm>) list.subList((request.page-1)* request.size, request.page* request.size-1);
+        data.totalPages = list_size/size;
+        data.page = page;
+        data.totalElements = page* size<list_size? size : list_size - size*(page-1);//若为最后一页，则该页长度不是每页的个数request.size
+        data.rows = list.subList((page-1)* size, (page-1)* size+data.totalElements);
         return Result.Success(data);
     }
     @RequestMapping("reject")
@@ -135,16 +153,16 @@ public class ApplicationController {
         applicationForm.result = 1;
         return Result.Success();
     }
-    public class createReq{
+    public static class createReq{
         public String token;
         public int userID;
-        public String ObjectID;
+        public String objectID;
         public int flag;
         public String email;
     }
 
 
-    public class getAllReq{
+    public static class getAllReq{
         public int size;
         public int page;
         public boolean isAll;
@@ -152,21 +170,21 @@ public class ApplicationController {
         public int flag;
 
     }
-    public class rejectReq{
+    public static class rejectReq{
         public String token;
         public int formID;
         public String reason;
 
     }
-    public class agreeReq{
+    public static class agreeReq{
         public String token;
         public int formID;
     }
-    public class getAllRes{
+    public static class getAllRes{
         public int totalPages;
         public int page;
         public int totalElements;
-        public ArrayList<ApplicationForm> rows = new ArrayList<>();
+        public List rows ;
     }
 
 }
