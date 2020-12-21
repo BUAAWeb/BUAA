@@ -10,6 +10,7 @@ import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.ApplicationForm;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.Expert;
+import se.buaa.Entity.Message;
 import se.buaa.Entity.Relation.Document_Expert;
 import se.buaa.Entity.Response.Result;
 import se.buaa.Entity.User;
@@ -35,6 +36,8 @@ public class ApplicationController {
     Docu_ExpertRepository docu_expertRepository;
     @Autowired
     ES_DocumentDao es_documentDao;
+    @Autowired
+    MessageRepository messageRepository;
 
     @RequestMapping("create")
     public Result create(@RequestParam String token,int userID,String objectID,String email,int flag){
@@ -114,6 +117,19 @@ public class ApplicationController {
         applicationForm.result = 2;
         applicationForm.msg = reason;
         applicationRepository.save(applicationForm);
+        Message message =new Message();
+        message.date = new Date();
+        message.content = "您未能成功认领编号为";
+        if(applicationForm.flag == 0){
+            message.content+= applicationForm.objectID+"的文献。\n";
+        }
+        else{
+            message.content+= applicationForm.objectID+"的门户。\n";
+        }
+        message.content+="其原因为："+reason;
+        message.user_id = applicationForm.userID;
+        message.is_read =false;
+        messageRepository.save(message);
         return Result.Success();
     }
     @RequestMapping("agree")
@@ -151,6 +167,18 @@ public class ApplicationController {
         else return Result.Error("201","flag参数错误");
         applicationForm.result = 1;
         applicationRepository.save(applicationForm);
+        Message message =new Message();
+        message.date = new Date();
+        message.content = "您已成功认领编号为";
+        if(applicationForm.flag == 0){
+            message.content+= applicationForm.objectID+"的文献。";
+        }
+        else{
+            message.content+= applicationForm.objectID+"的门户。";
+        }
+        message.user_id = applicationForm.userID;
+        message.is_read =false;
+        messageRepository.save(message);
         return Result.Success();
     }
     public static class createReq{
