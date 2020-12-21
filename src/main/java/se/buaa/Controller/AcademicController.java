@@ -575,7 +575,7 @@ public class AcademicController {
         else{
             CollectionKey collectionKey=new CollectionKey(user_id,document_id);
             Optional<Collection> res = collectionRepository.findById(collectionKey);
-            if(res!=null){
+            if(res.isPresent()){
                 es_document.setIs_favor(true);
             }
             else {
