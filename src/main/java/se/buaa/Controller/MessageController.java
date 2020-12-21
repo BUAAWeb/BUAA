@@ -11,6 +11,7 @@ import se.buaa.Entity.Response.Result;
 import se.buaa.Repository.MessageRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/message")
@@ -23,7 +24,7 @@ public class MessageController {
         if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        List<Message> messageList = messageRepository.findAllByUser_id(id);
+        List<Message> messageList = messageRepository.findByUserid(id);
         return Result.Success(messageList);
     }
 
@@ -32,7 +33,8 @@ public class MessageController {
         if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        Message message = messageRepository.findByMsg_id(id);
+        Optional<Message> Omessage = messageRepository.findById(id);
+        Message message = Omessage.get();
         message.is_read = true;
         messageRepository.save(message);
         return Result.Success();
@@ -43,7 +45,7 @@ public class MessageController {
         if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        messageRepository.deleteByMsg_id(id);
+        messageRepository.deleteById(id);
         return Result.Success();
     }
 

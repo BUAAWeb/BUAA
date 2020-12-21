@@ -5,8 +5,6 @@ import se.buaa.Entity.Message;
 
 import java.util.List;
 
-public interface MessageRepository extends JpaRepository <Message,Integer> {
-    List<Message> findAllByUser_id(Integer id);
-    Message findByMsg_id(Integer id);
-    void deleteByMsg_id(Integer id);
+public interface MessageRepository extends JpaRepository<Message,Integer> {
+    List<Message> findByUserid(Integer id);
 }
