@@ -50,10 +50,10 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
     }
 
     @Override
-    public List<ES_Document> findByKeywordsLike(List<String> keywords) {
+    public List<ES_Document> findByKeywordsIn(List<String> keywords) {
         List<ES_Document> es_documentList = new ArrayList<>();
         for(String keyword : keywords){
-            List<ES_Document> es_documentList1 = es_documentDao.findByKeywordsLike(keyword);
+            List<ES_Document> es_documentList1 = es_documentDao.findByKeywordsIn(keyword);
             if(es_documentList1 != null)
                 es_documentList.addAll(es_documentList1);
         }
@@ -62,7 +62,7 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
     }
 
     @Override
-    public Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,String keywords, String experts, String origin, String startTime, String endTime) {
+    public Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,String keywords, String experts, String origin, String startTime, String endTime) {
         if(startTime == null || startTime.equals(""))
             startTime = "0";
         if(endTime == null || endTime.equals(""))
@@ -70,11 +70,11 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
         keywords = keywords == null ? "":keywords;
         experts = experts == null ? "":experts;
         origin = origin == null ? "":origin;
-        return es_documentDao.findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(page,keywords, experts, origin, startTime, endTime);
+        return es_documentDao.findByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(page,keywords, experts, origin, startTime, endTime);
     }
 
     @Override
-    public int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(String keywords, String experts, String origin, String startTime, String endTime) {
+    public int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(String keywords, String experts, String origin, String startTime, String endTime) {
         if(startTime == null || startTime.equals(""))
             startTime = "0";
         if(endTime == null || endTime.equals(""))
@@ -82,10 +82,10 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
         keywords = keywords == null ? "":keywords;
         experts = experts == null ? "":experts;
         origin = origin == null ? "":origin;
-        return es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(keywords, experts, origin, startTime, endTime);
+        return es_documentDao.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(keywords, experts, origin, startTime, endTime);
     }
     @Override
-    public int countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(String keywords, String experts, String origin, String startTime, String endTime,String dtype) {
+    public int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(String keywords, String experts, String origin, String startTime, String endTime,String dtype) {
         if(startTime == null || startTime.equals(""))
             startTime = "0";
         if(endTime == null || endTime.equals(""))
@@ -94,9 +94,9 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
         experts = experts == null ? "":experts;
         origin = origin == null ? "":origin;
         if(dtype!=null)
-            return es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(keywords, experts, origin, startTime, endTime,dtype);
+            return es_documentDao.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(keywords, experts, origin, startTime, endTime,dtype);
         else
-            return es_documentDao.countByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(keywords, experts, origin, startTime, endTime);
+            return es_documentDao.countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(keywords, experts, origin, startTime, endTime);
     }
 
     public static void handleParams(String keywords, String experts, String origin, String startTime, String endTime){
