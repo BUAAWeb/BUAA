@@ -14,9 +14,7 @@ package se.buaa.Controller;
 //500 （internal server error）- 通用错误响应
 //503 （Service Unavailable）- 服务当前无法处理请求
 import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -59,6 +57,7 @@ import java.net.http.HttpRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 //@CrossOrigin
@@ -78,20 +77,84 @@ public class AcademicController {
     @Autowired
     CollectionRepository collectionRepository;
 
-    @RequestMapping("test")
-    public void test(){
-        long total = es_documentDao.count();
-        System.out.println("total: " + total);
-        for(int i = 0;i <= 10 ;i++){
-            PageRequest page = PageRequest.of(i, 100);
-            Iterable<ES_Document> highCitedList = es_documentDao.findAll(page);
-            System.out.println("page:" + i + 1);
-            for(ES_Document es_document : highCitedList) {
-                System.out.println(es_document.toString());
-//                es_document.setViews(0);
-                es_documentDao.save(es_document);
+    public void test1(int k,String experts){
+        PageRequest page = PageRequest.of(0, 200);
+        Page<ES_Document> es_documents  = null;
+        switch (k){
+            case 1:{
+                es_documents = es_documentDao.findByExpertsLike(page,experts);
+                break;
+            }
+            case 2:{
+                es_documents = es_documentDao.findByExpertsContaining(page,experts);
+                break;
+            }
+            case 3:{
+                es_documents = es_documentDao.findByExpertsContains(page,experts);
+                break;
+            }
+            case 4:{
+                es_documents = es_documentDao.findByExpertsIn(page,experts);
+                break;
+            }
+            case 5:{
+                es_documents = es_documentDao.findByExpertsIsIn(page,experts);
+                break;
             }
         }
+
+        List<ES_Document> es_documentList = es_documents.toList();
+        for(ES_Document es_document : es_documentList)
+            System.out.println(es_document.getExperts().toString());
+    }
+
+    @RequestMapping("test")
+    public void test(){
+        String field = "experts";
+        String keyword = "*,张伟,*";
+        String time = "time";
+//        BoolQueryBuilder boolQueryBuilder1 = new BoolQueryBuilder().should(QueryBuilders);
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        boolQueryBuilder.should(QueryBuilders.wildcardQuery(field, keyword));
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withPageable(PageRequest.of(0, 100))
+                .build();
+//        long total  = es_documentDao.count();
+        Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
+        List<ES_Document> es_documentList = es_documents.toList();
+        for(ES_Document es_document : es_documentList)
+            System.out.println(es_document.getExperts().toString());
+//        PageRequest page = PageRequest.of(0, 200);
+//        String experts1 = "张伟";
+//        String experts2 = ",张伟,";
+//        String experts3 = "*张伟*";
+//
+//        for (int i = 0 ;i<5;i++){
+//            System.out.println(i + " :   experts:" + experts1);
+//            test1(i+1,experts1);
+//            System.out.println(i + " :   experts:" + experts2);
+//            test1(i+1,experts2);
+//            System.out.println(i + " :   experts:" + experts3);
+//            test1(i+1,experts3);
+//        }
+
+
+
+
+//        WildcardQueryBuilder wildcardQueryBuilder = new WildcardQueryBuilder()
+//        long total = es_documentDao.count();
+//        System.out.println("total: " + total);
+//        for(int i = 0;i <= 1000 ;i++){
+//            PageRequest page = PageRequest.of(i, 100);
+//            Iterable<ES_Document> highCitedList = es_documentDao.findAll(page);
+//            System.out.println("page:" + i + 1);
+//            for(ES_Document es_document : highCitedList) {
+//                System.out.println(es_document.toString());
+////                es_document.setViews(0);
+//                es_documentDao.save(es_document);
+//            }
+//        }
 //        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("title", "小米");
 //        // 执行查询
 //        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();

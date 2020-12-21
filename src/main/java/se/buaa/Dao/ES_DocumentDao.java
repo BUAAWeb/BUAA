@@ -64,6 +64,15 @@ public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Lo
     Page<ES_Document> findByExpertsIn(Pageable page,List<String> experts);
     List<ES_Document> findByExpertsIn(List<String> experts);
     Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLike(Pageable page,String keywords,String experts,String origin);
+
+    Page<ES_Document> findByExpertsLike(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsIn(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsContaining(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsContains(Pageable page,String keywords);
+//    Page<ES_Document> (Pageable page,String keywords);
+    Page<ES_Document> findByKeywordsIsIn(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsIsIn(Pageable page,String experts);
+
     Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
                                                                                   String keywords,String experts,String origin,String startTime,String endTime);
     int countByExpertsIn(String experts);

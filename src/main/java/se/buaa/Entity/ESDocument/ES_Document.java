@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
+import org.apache.lucene.codecs.compressing.FieldsIndexWriter;
+import org.elasticsearch.index.Index;
+import org.elasticsearch.index.IndexComponent;
 import org.sonatype.guice.bean.reflect.IgnoreSetters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 import se.buaa.Dao.ES_ExpertDao;
 import se.buaa.Entity.Expert;
 import se.buaa.Repository.ExpertRepository;
@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Data
-@Document(indexName = "document1",indexStoreType = "doc")
+@Document(indexName = "document2",indexStoreType = "doc")
 public class ES_Document {
     @Id
     private String id;
@@ -33,8 +33,10 @@ public class ES_Document {
     private String dtype;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @Field(analyzer = "ik_smart",type = FieldType.Text)
+//    @Field(analyzer = "ik_smart",type = FieldType.Keyword)
+    @Field(index = true, type = FieldType.Keyword)
     private String experts;
+
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String keywords;
     @Field(analyzer = "ik_smart", type = FieldType.Text)//摘要
@@ -171,7 +173,7 @@ public class ES_Document {
     @PersistenceConstructor
     public ES_Document(String dtype,String id, String title, String experts, String keywords, String summary,
                        String link, int cited_quantity, String origin,
-                       String time,List<String> keywordList,List<ES_Expert> authors ){
+                       String time){
         this.documentid = id;
         this.title = title;
         this.experts = experts;
@@ -181,8 +183,8 @@ public class ES_Document {
         this.cited_quantity = cited_quantity;
         this.time = time;
         this.dtype = dtype;
-        this.keywordList = keywordList;
-        this.authors = authors;
+//        this.keywordList = keywordList;
+//        this.authors = authors;
         String[] authorNames = experts.split(",");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
