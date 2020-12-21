@@ -448,9 +448,9 @@ public class AcademicController {
 
     public CodeEnum checkSearchInput(Post post){
         if(post.getPage() == null)
-            return CodeEnum.noPage;
+            post.setPage("1");
 
-        if(post.getUserID() == null)
+        if(post.getUserID() == null || post.getUserID().equals("-1"))
             return CodeEnum.noUser;
 
         if(post.getSort() == null)
@@ -567,7 +567,6 @@ public class AcademicController {
 
         Data data = getSearchResult(search_word,sort,typeList,pageNum);
         int total = data.total;
-
 //        List<String> typeList = getTypeList(filterWords.getType());
 //
 //        Sort sort1 = getSort(sort);
@@ -798,8 +797,8 @@ public class AcademicController {
 //        }
     }
     @RequestMapping("getById")
-    public Result<ES_Document> getById(String document_id,int user_id){
-        if(user_id == -1)
+    public Result<ES_Document> getById(String document_id,String user_id){
+        if(user_id == null || user_id.equals("-1"))
             return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
         if(document_id == null)
             return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
@@ -807,7 +806,14 @@ public class AcademicController {
         if(es_document == null)
             return new Result<>(CodeEnum.documentNotExist.getCode(), CodeEnum.documentNotExist.toString(),null);
         else{
-            CollectionKey collectionKey=new CollectionKey(user_id,document_id);
+            CollectionKey collectionKey;
+            try {
+                collectionKey = new CollectionKey(Integer.parseInt(user_id), document_id);
+            }
+            catch (Exception e){
+                return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
+            }
+
             Optional<Collection> res = collectionRepository.findById(collectionKey);
             es_document.setIs_favor(res.isPresent());
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
