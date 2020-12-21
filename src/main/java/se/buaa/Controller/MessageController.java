@@ -23,7 +23,7 @@ public class MessageController {
         if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        List<Message> messageList = messageRepository.findAllByUser_id(id);
+        List<Message> messageList = messageRepository.findByUser_id(id);
         return Result.Success(messageList);
     }
 

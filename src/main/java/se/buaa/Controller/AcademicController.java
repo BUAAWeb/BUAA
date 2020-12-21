@@ -380,7 +380,7 @@ public class AcademicController {
         orderList.add(order);
         Sort sort = Sort.by(orderList);
 
-        if(keyword==null)
+        if(keyword == null)
             return new Result("308", CodeEnum.error.toString());
         List<String> typeList=new ArrayList<>();
         if(type == null){
@@ -799,6 +799,8 @@ public class AcademicController {
     }
     @RequestMapping("getById")
     public Result<ES_Document> getById(String document_id,int user_id){
+        if(user_id == -1)
+            return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
         if(document_id == null)
             return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
         ES_Document es_document = es_documentDao.findByDocumentid(document_id);
@@ -807,12 +809,7 @@ public class AcademicController {
         else{
             CollectionKey collectionKey=new CollectionKey(user_id,document_id);
             Optional<Collection> res = collectionRepository.findById(collectionKey);
-            if(res.isPresent()){
-                es_document.setIs_favor(true);
-            }
-            else {
-                es_document.setIs_favor(false);
-            }
+            es_document.setIs_favor(res.isPresent());
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
 

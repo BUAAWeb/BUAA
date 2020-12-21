@@ -25,7 +25,7 @@ public class BuaaApplication {
         typeList.add("图书");
         typeList.add("专利");
         typeList.add("会议");
-        typeList.add("期刊");
+        typeList.add("学位");
     }
 //注释
 }
