@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
-import org.apache.lucene.codecs.compressing.FieldsIndexWriter;
-import org.elasticsearch.index.Index;
-import org.elasticsearch.index.IndexComponent;
 import org.sonatype.guice.bean.reflect.IgnoreSetters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.PersistenceConstructor;
@@ -113,6 +110,9 @@ public class ES_Document {
         this.views = views;
     }
 
+    public void setEs_expertDao(ES_ExpertDao es_expertDao) {
+        this.es_expertDao = es_expertDao;
+    }
 
     public String getId() {
         return id;
@@ -166,10 +166,11 @@ public class ES_Document {
         return views;
     }
 
-//    @Field(analyzer = "ik_smart")
+    public ES_ExpertDao getEs_expertDao() {
+        return es_expertDao;
+    }
     @Transient
     private List<ES_Expert> authors = new ArrayList<>();
-//    @Field(analyzer = "ik_smart")
     @Transient
     private List<String> keywordList = new ArrayList<>();
 
@@ -186,8 +187,6 @@ public class ES_Document {
         this.cited_quantity = cited_quantity;
         this.time = time;
         this.dtype = dtype;
-//        this.keywordList = keywordList;
-//        this.authors = authors;
         String[] authorNames = experts.split(",");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
@@ -195,7 +194,7 @@ public class ES_Document {
             expert.setName(author);
             this.authors.add(expert);
         }
-        String[] keyword = experts.split(",");
+        String[] keyword = keywords.split(",");
         this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)
 //            this.time = null;

@@ -25,4 +25,5 @@ public interface ES_DocumentService {
             String keywords,String experts,String origin,String startTime,String endTime);
     int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
             String keywords,String experts,String origin,String startTime,String endTime,String dType);
+
 }

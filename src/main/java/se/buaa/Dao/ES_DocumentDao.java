@@ -78,12 +78,38 @@ public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Lo
                                                                                   String keywords,String experts,String origin,String startTime,String endTime);
     Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLike(Pageable page,String keywords,String experts,String origin);
     Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page, String keywords,String experts,String origin,String startTime,String endTime);
-    Page<ES_Document> findByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,String title,String summary,String keywords,String experts,String origin,String startTime,String endTime);
+    Page<ES_Document> findByTitleInOrSummaryInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            Pageable page,String title,String summary,String keywords,String experts,
+            String origin,String startTime,String endTime,String dType);
+    Page<ES_Document> findByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            Pageable page,String title,String summary,String keywords,String experts,
+            String origin,String startTime,String endTime,String dType);
+    Page<ES_Document> findByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            Pageable page,String title,String experts, String origin,String startTime,String endTime,String dType,
+            String summary,String experts1, String origin1,String startTime1,String endTime1,String dType1,
+            String keywords, String experts2, String origin2,String startTime2,String endTime2,String dType2);
+    int countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            String title,String experts, String origin,String startTime,String endTime,String dType,
+            String summary,String experts1, String origin1,String startTime1,String endTime1,String dType1,
+            String keywords, String experts2, String origin2,String startTime2,String endTime2,String dType2);
+    Page<ES_Document> findByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+            Pageable page,String title,String experts, String origin,String startTime,String endTime,List<String> dType,
+            String summary,String experts1, String origin1,String startTime1,String endTime1,List<String> dType1,
+            String keywords, String experts2, String origin2,String startTime2,String endTime2,List<String> dType2);
+    int countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+            String title,String experts, String origin,String startTime,String endTime,List<String> dType,
+            String summary,String experts1, String origin1,String startTime1,String endTime1,List<String> dType1,
+            String keywords, String experts2, String origin2,String startTime2,String endTime2,List<String> dType2);
     int countByExpertsIn(String experts);
     int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
             String keywords,String experts,String origin,String startTime,String endTime);
     int countByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
             String keywords,String experts,String origin,String startTime,String endTime,String dType);
-    int countByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
+    int countByTitleInOrSummaryInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(
             String title,String summary,String keywords,String experts,String origin,String startTime,String endTime);
+    int countByTitleInOrSummaryInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            String title,String summary,String keywords,String experts,String origin,String startTime,String endTime,String dType);
+    int countByTitleInAndSummaryInAndKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(
+            String title,String summary,String keywords,String experts,String origin,String startTime,String endTime,String dType);
+
 }
