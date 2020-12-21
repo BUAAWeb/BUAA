@@ -1,12 +1,16 @@
 package se.buaa.Entity.Enumeration;
 
 public enum CodeEnum {
-    success,error,sortNotFound,pageNotInteger,pageLessThanOne,pageOutOfRange,documentNotExist,docIdNotExist,noSort,noPage;
+    success,error,sortNotFound,pageNotInteger,pageLessThanOne,
+    pageOutOfRange,documentNotExist,docIdNotExist,noSort,noPage,
+    noUser,yearNotInteger,noResult;
 
     public String getCode(){
         switch (this){
             case success:
                 return "200";
+            case noResult:
+                return "100";
             case pageNotInteger:
                 return "301";
             case sortNotFound:
@@ -25,6 +29,10 @@ public enum CodeEnum {
                 return "308";
             case error:
                 return "309";
+            case noUser:
+                return "310";
+            case yearNotInteger:
+                return "311";
             default:
                 return "404";
         }
@@ -34,6 +42,8 @@ public enum CodeEnum {
         switch (this){
             case success:
                 return "success";
+            case noResult:
+                return "No search Result";
             case pageNotInteger:
                 return "Page is not a number";
             case noPage:
@@ -50,6 +60,10 @@ public enum CodeEnum {
                 return "Document is not exist";
             case docIdNotExist:
                 return "The Document ID you search is not exist";
+            case noUser:
+                return "No User ID";
+            case yearNotInteger:
+                return "Year is not a number";
             case error:
                 return "error";
             default:

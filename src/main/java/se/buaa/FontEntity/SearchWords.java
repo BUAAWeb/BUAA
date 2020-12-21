@@ -10,6 +10,8 @@ public class SearchWords {
     String startTime;
     String endTime;
 
+//    public SearchWords copy()
+
     public String getKw() {
         return kw;
     }

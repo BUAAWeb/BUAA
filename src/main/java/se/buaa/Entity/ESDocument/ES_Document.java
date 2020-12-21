@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Data
-@Document(indexName = "document",indexStoreType = "doc")
+@Document(indexName = "document2",indexStoreType = "doc")
 public class ES_Document {
     @Id
     private String id;
@@ -33,7 +33,7 @@ public class ES_Document {
     private String dtype;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @Field(analyzer = "ik_smart", type = FieldType.Text)
+    @Field(index = true, type = FieldType.Keyword)
     private String experts;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String keywords;
