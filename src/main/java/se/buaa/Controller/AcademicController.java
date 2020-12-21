@@ -578,6 +578,9 @@ public class AcademicController {
             if(res!=null){
                 es_document.setIs_favor(true);
             }
+            else {
+                es_document.setIs_favor(false);
+            }
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
 
