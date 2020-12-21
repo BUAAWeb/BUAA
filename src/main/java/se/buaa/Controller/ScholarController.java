@@ -23,7 +23,6 @@ import java.util.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/scholar")
 public class ScholarController {
 
     @Autowired
@@ -36,7 +35,7 @@ public class ScholarController {
     User_ExpertRepository user_expertRepository;
 
 
-    @RequestMapping("/getCoAuthors")
+    @GetMapping("/scholar/getCoAuthors")
     public Result getcoAuthors(@RequestParam("scholar_id") String scholar_id){
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
 
@@ -98,7 +97,7 @@ public class ScholarController {
     }
 
 
-    @RequestMapping("/getCoAffiliate")
+    @GetMapping("/scholar/getCoAffiliate")
     public Result getcoAffiliate(@RequestParam("scholar_id") String scholar_id) {
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
 //        ExampleMatcher matcher = ExampleMatcher.matching()
@@ -168,8 +167,9 @@ public class ScholarController {
     }
 
     /** 获取科研人员相关信息 */
-    @PostMapping("/getInfo")
-    public Result getScholarInfo(@RequestParam(value = "user_id") Integer user_id, @RequestParam(value = "scholar_id") String scholar_id) {
+    @GetMapping("/scholar/getInfo")
+    public Result getScholarInfo(@RequestParam(value = "scholar_id") String scholar_id
+                                    , @RequestParam(value = "user_id") String user_id) {
         Expert expert = expertRepository.findByExpertID(scholar_id);
 
         // 错误处理，类型码在 ErrorConfig.xml 文件中，类型码要和创建的 Exception 类关联
@@ -199,7 +199,8 @@ public class ScholarController {
             scholarInfo.achList.add(new Achievement(doc.getTitle(), doc.getCitedQuantity()));
         }
 
-        List<User_Expert> list = user_expertRepository.findByUserIdAndExpertId(user_id, scholar_id);
+        int userId = Integer.parseInt(user_id);
+        List<User_Expert> list = user_expertRepository.findByUserIdAndExpertId(userId, scholar_id);
 
         scholarInfo.isFocus = list.size() != 0;
 
@@ -300,14 +301,14 @@ public class ScholarController {
 //    }
 
     /** 关注、取消关注 */
-    @RequestMapping("/focusScholar")
-    @ResponseBody
+    @GetMapping("/scholar/focusScholar")
     public Result focusScholar(@RequestParam(value = "scholar_id") String scholar_id
-                            , @RequestParam(value = "user_id") int user_id) {
-        List<User_Expert> list = user_expertRepository.findByUserIdAndExpertId(user_id, scholar_id);
+                            , @RequestParam(value = "user_id") String user_id) {
+        int userId = Integer.parseInt(user_id);
+        List<User_Expert> list = user_expertRepository.findByUserIdAndExpertId(userId, scholar_id);
 
         if (list.size() == 0) {
-            User_Expert ue = new User_Expert(user_id, scholar_id);
+            User_Expert ue = new User_Expert(userId, scholar_id);
             user_expertRepository.save(ue);
             return Result.Success(true);
         }
