@@ -8,7 +8,7 @@ import java.util.Date;
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer msg_id;
+    public Integer id;
     @Column(name = "content")
     public String content;
     @Column(name = "is_read")
@@ -16,5 +16,5 @@ public class Message {
     @Column(name = "date")
     public Date date;
     @Column(name = "user_id")
-    public Integer user_id;
+    public Integer userid;
 }

@@ -127,7 +127,7 @@ public class ApplicationController {
             message.content+= applicationForm.objectID+"的门户。\n";
         }
         message.content+="其原因为："+reason;
-        message.user_id = applicationForm.userID;
+        message.userid = applicationForm.userID;
         message.is_read =false;
         messageRepository.save(message);
         return Result.Success();
@@ -176,7 +176,7 @@ public class ApplicationController {
         else{
             message.content+= applicationForm.objectID+"的门户。";
         }
-        message.user_id = applicationForm.userID;
+        message.userid = applicationForm.userID;
         message.is_read =false;
         messageRepository.save(message);
         return Result.Success();
