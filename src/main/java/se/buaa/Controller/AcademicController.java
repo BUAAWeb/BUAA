@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.web.bind.annotation.*;
+import se.buaa.Config.JwtUtils;
 import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Dao.ES_ExpertDao;
 import se.buaa.Entity.Collection;
@@ -37,6 +38,7 @@ import se.buaa.FontEntity.*;
 import se.buaa.Repository.CollectionRepository;
 import se.buaa.Service.ES_DocumentService;
 
+//import java.net.http.HttpRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -805,8 +807,11 @@ public class AcademicController {
         else{
             CollectionKey collectionKey=new CollectionKey(user_id,document_id);
             Optional<Collection> res = collectionRepository.findById(collectionKey);
-            if(res!=null){
+            if(res.isPresent()){
                 es_document.setIs_favor(true);
+            }
+            else {
+                es_document.setIs_favor(false);
             }
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
@@ -814,7 +819,10 @@ public class AcademicController {
     }
 
     @GetMapping("favorSc")
-    public Result<Boolean> favorSc(@RequestParam("document_id") String doc_id,@RequestParam("user_id") int user_id){
+    public Result<Boolean> favorSc(@RequestParam("document_id") String doc_id,@RequestParam("user_id") int user_id,@RequestParam("token") String token){
+        if (JwtUtils.verifyToken(token)!=0){
+            return Result.Error("201","token非法，请重新登录");
+        }
         CollectionKey ck =new CollectionKey(user_id,doc_id);
         Optional<Collection> res = collectionRepository.findById(ck);
         if(res.isPresent())

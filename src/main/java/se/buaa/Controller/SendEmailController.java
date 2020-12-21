@@ -7,8 +7,6 @@ import se.buaa.Config.MailSender;
 import se.buaa.Entity.Response.Result;
 import se.buaa.Repository.UserRepository;
 
-import java.io.Serializable;
-
 @RestController
 public class SendEmailController {
     @Autowired
