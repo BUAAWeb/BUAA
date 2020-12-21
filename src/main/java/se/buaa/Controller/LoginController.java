@@ -37,7 +37,9 @@ public class LoginController {
             map.put("id",db_user.userID);
             map.put("username",db_user.userName);
             map.put("password",db_user.passwd);
+            map.put("is_admin",db_user.isAdmin);
             data.token = JwtUtils.createToken(map);
+            data.is_admin = db_user.isAdmin==1;
 
         }
         else {
@@ -49,6 +51,7 @@ public class LoginController {
     public class Data{
         public int userID=-1;
         public String token;
+        public boolean is_admin;
     }
 }
 

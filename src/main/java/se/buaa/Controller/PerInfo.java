@@ -1,7 +1,9 @@
 package se.buaa.Controller;
 
+import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import se.buaa.Config.JwtUtils;
 import se.buaa.Entity.Data.FollowedExpertInfo;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Response.Result;
@@ -13,6 +15,7 @@ import se.buaa.Repository.User_ExpertRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 //this class maps four request:/user/getPerInfo, /user/changeInfo, /user/changeImg and /user/changePasswd,
 //which relates to personInfo
@@ -104,6 +107,16 @@ public class PerInfo {
         }
 
         return Result.Success(list);
+    }
+    @RequestMapping("/user/isadmin")
+    @ResponseBody
+    public Result isAdmin(@RequestParam String token){
+        Map map= JwtUtils.parseToken(token);
+        boolean is_admin = (Boolean) map.get("is_admin");
+        if (is_admin)
+            return Result.Success();
+        else
+            return Result.Error();
     }
 
 
