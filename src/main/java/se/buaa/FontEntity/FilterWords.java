@@ -1,15 +1,15 @@
 package se.buaa.FontEntity;
 
 public class FilterWords {
-    String startYear;
+    String year;
     String type;
 
-    public String getStartYear() {
-        return startYear;
+    public String getYear() {
+        return year;
     }
 
-    public void setStartYear(String startYear) {
-        this.startYear = startYear;
+    public void setYear(String year) {
+        this.year = year;
     }
 
     public String getType() {
