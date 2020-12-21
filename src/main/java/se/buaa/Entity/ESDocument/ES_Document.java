@@ -199,7 +199,7 @@ public class ES_Document {
             expert.setName(author);
             this.authors.add(expert);
         }
-        String[] keyword = experts.split(",");
+        String[] keyword = keywords.split(",");
         this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)
 //            this.time = null;
