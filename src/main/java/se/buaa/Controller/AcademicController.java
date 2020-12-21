@@ -13,20 +13,6 @@ package se.buaa.Controller;
 //415 （unsupported media type）- 接受到的表示不受支持
 //500 （internal server error）- 通用错误响应
 //503 （Service Unavailable）- 服务当前无法处理请求
-import org.apache.commons.collections.IteratorUtils;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregator;
-import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
-import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +23,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.web.bind.annotation.*;
+import se.buaa.Config.JwtUtils;
 import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Dao.ES_ExpertDao;
 import se.buaa.Entity.Collection;
@@ -53,7 +40,7 @@ import se.buaa.Repository.CollectionRepository;
 import se.buaa.Repository.ExpertRepository;
 import se.buaa.Service.ES_DocumentService;
 
-import java.net.http.HttpRequest;
+//import java.net.http.HttpRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -597,7 +584,10 @@ public class AcademicController {
     }
 
     @GetMapping("favorSc")
-    public Result<Boolean> favorSc(@RequestParam("document_id") String doc_id,@RequestParam("user_id") int user_id){
+    public Result<Boolean> favorSc(@RequestParam("document_id") String doc_id,@RequestParam("user_id") int user_id,@RequestParam("token") String token){
+        if (JwtUtils.verifyToken(token)!=0){
+            return Result.Error("201","token非法，请重新登录");
+        }
         CollectionKey ck =new CollectionKey(user_id,doc_id);
         Optional<Collection> res = collectionRepository.findById(ck);
         if(res.isPresent())
