@@ -821,9 +821,9 @@ public class AcademicController {
 //        }
     }
     @RequestMapping("getById")
-    public Result<ES_Document> getById(String document_id,String user_id){
-        if(user_id == null)
-            return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
+    public Result<ES_Document> getById(String document_id,int user_id){
+//        if(user_id == null)
+//            return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
         if(document_id == null)
             return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
         ES_Document es_document = es_documentDao.findByDocumentid(document_id);
@@ -831,15 +831,11 @@ public class AcademicController {
             return new Result<>(CodeEnum.documentNotExist.getCode(), CodeEnum.documentNotExist.toString(),null);
         else{
             CollectionKey collectionKey;
-            try {
-                collectionKey = new CollectionKey(Integer.parseInt(user_id), document_id);
+            if(user_id!=-1){
+                collectionKey = new CollectionKey(user_id, document_id);
+                Optional<Collection> res = collectionRepository.findById(collectionKey);
+                es_document.setIs_favor(res.isPresent());
             }
-            catch (Exception e){
-                return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
-            }
-
-            Optional<Collection> res = collectionRepository.findById(collectionKey);
-            es_document.setIs_favor(res.isPresent());
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
 
