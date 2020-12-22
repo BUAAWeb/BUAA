@@ -19,4 +19,6 @@ import java.util.List;
 public interface  ES_ExpertDao extends ElasticsearchRepository<ES_Expert, Long> {
     ES_Expert findByExpertid(String id);
     List<ES_Expert> findByName(String name);
+    Page<ES_Expert> findByNameContaining(Pageable page,String name);
+    Page<ES_Expert> findByNameIn(Pageable page,String name);
 }
