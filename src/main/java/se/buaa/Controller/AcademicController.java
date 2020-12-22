@@ -552,7 +552,8 @@ public class AcademicController {
         if(result != CodeEnum.success) return new Result<>(result.getCode(),result.toString(),new Data());
 
 //        System.out.println(post.toString());
-
+        //
+        Date date1=new Date();
         //变量声明
         int pageNum;
         String page = post.getPage();
@@ -610,7 +611,8 @@ public class AcademicController {
 //        data.setTotal(total);
         data.filter_list.add(getTimeFilter(search_word,typeList));
         data.filter_list.add(getTypeFilter(search_word,typeList));
-
+        Date date2=new Date();
+        data.time= (int) (date2.getTime()-date1.getTime());
         return new Result<>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
     }
     private Filter getTimeFilter(SearchWords searchWords,List<String> typeList){
