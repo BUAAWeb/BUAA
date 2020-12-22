@@ -281,7 +281,7 @@ public class AcademicController {
 
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 
-        if(keywords != null){
+        if(keywords != null&&keywords!=""){
             QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("*" + keywords + "*",//keywords,//"*" + keywords + "*",
                     "title","summary");
             boolQueryBuilder.must(queryBuilder);
@@ -291,14 +291,14 @@ public class AcademicController {
                     .includeUpper(true).includeLower(true);
             boolQueryBuilder.must(queryBuilder);
         }
-        if(experts != null){
+        if(experts != null&&experts!=""){
             QueryBuilder queryBuilder;
             experts  = experts.replaceAll("[,，\\s;.。]+","*");
             System.out.println(experts);
             queryBuilder = QueryBuilders.wildcardQuery( "experts","*" + experts + "*");
             boolQueryBuilder.must(queryBuilder);
         }
-        if(origin != null){
+        if(origin != null&&origin!=""){
             QueryBuilder queryBuilder = QueryBuilders.wildcardQuery( "origin","*" + origin + "*");
             boolQueryBuilder.must(queryBuilder);
         }
@@ -316,7 +316,7 @@ public class AcademicController {
         Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
         List<ES_Document> es_documentList = es_documents.toList();
         //如果只搜作者，添加返回作者列表
-        if((keywords==null||keywords=="")&&experts!=null){// TODO: 2020-12-22 org
+        if((keywords==null||keywords=="")&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
             List<String> expertList=new ArrayList<>();
             expertList.add(experts);
             PageRequest page = PageRequest.of(1, 6);
