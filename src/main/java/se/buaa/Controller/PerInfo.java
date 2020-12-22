@@ -95,9 +95,8 @@ public class PerInfo {
         }
     }
 
-    @RequestMapping("/user/getFollowList")
-    @ResponseBody
-    public Result getFollowList(@RequestParam int userid) {
+    @GetMapping("/user/getFollowList")
+    public Result getFollowList(@RequestParam(value = "userID") int userid) {
         List<User_Expert> ueList = user_expertRepository.findByUserId(userid);
         List<FollowedExpertInfo> list = new ArrayList<>();
 
