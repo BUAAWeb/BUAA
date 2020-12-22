@@ -6,9 +6,11 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.*;
+import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.Data.Achievement;
 import se.buaa.Entity.Data.ScholarInfo;
 import se.buaa.Entity.Document;
+import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.Expert;
 import se.buaa.Entity.Relation.Document_Expert;
 import se.buaa.Entity.Response.Result;
@@ -33,6 +35,8 @@ public class ScholarController {
     DocumentRepository documentRepository;
     @Autowired
     User_ExpertRepository user_expertRepository;
+    @Autowired
+    ES_DocumentDao es_documentDao;
 
 
     @GetMapping("/scholar/getCoAuthors")
@@ -168,8 +172,8 @@ public class ScholarController {
         int size = Math.min(exp_docs.size(), 4);
 
         for (int i = 0; i < size; i++) {
-            Document doc = documentRepository.findDocumentByDocumentID(exp_docs.get(i).getDocumentID());
-            scholarInfo.achList.add(new Achievement(doc.getTitle(), doc.getCitedQuantity()));
+            ES_Document doc = es_documentDao.findByDocumentid(exp_docs.get(i).getDocumentID());
+            scholarInfo.achList.add(new Achievement(doc.getTitle(), doc.getCited_quantity()));
         }
 
         int userId = Integer.parseInt(user_id);
@@ -179,99 +183,6 @@ public class ScholarController {
 
         return Result.Success(scholarInfo);
     }
-
-//    /** 获取科研人员相关文档 */
-//    @PostMapping("/getRelateSc")
-//    @ResponseBody
-//    public Result getScRelatedDoc (@RequestBody Map<String, Object> map) {
-//        /* 查询字段提取 */
-//        if (map.get("scholar_id") == null) return Result.Error(new ScholarException("00"));
-//        String scholar_id = map.get("scholar_id").toString();
-//
-//        Expert expert = expertRepository.findByExpertID(scholar_id);
-//        if (expert == null) return Result.Error(new ScholarException("01"));
-//
-////        ExampleMatcher matcher = ExampleMatcher.matching()
-////                .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
-////                .withIgnorePaths("id").withIgnorePaths("documentid");
-////        Document_Expert tmpRelation = new Document_Expert();
-////        tmpRelation.setExpertID(scholar_id);
-////        Example<Document_Expert> example = Example.of(tmpRelation, matcher);
-////        List<Document_Expert> exp_docs = docu_expertRepository.findAll(example);
-////        List<Document> docs = new ArrayList<>();
-////
-////        for (int i = 0; i < exp_docs.size(); i++) {
-////            docs.add(documentRepository.findByDocumentID(exp_docs.get(i).getDocumentID()));
-////        }
-//
-//        ExampleMatcher matcher = ExampleMatcher.matching();
-//        Document tmpDoc = new Document();
-//
-//        if (map.get("sc_year") != null) {
-//            String sc_year = map.get("sc_year").toString();
-//            if (!sc_year.equals("")) {
-//                matcher.withMatcher("date", ExampleMatcher.GenericPropertyMatcher::startsWith);
-//                tmpDoc.setDate(sc_year);
-//            }
-//        }
-//
-//        if (map.get("paper_type") != null) {
-//            int paper_type = Integer.parseInt(map.get("paper_type").toString());
-//            matcher.withMatcher("document_type", ExampleMatcher.GenericPropertyMatcher::exact);
-//            tmpDoc.setDocument_type(paper_type);
-//        }
-//
-//        int first_author_flag = 0;
-//        if (map.get("first_author") != null) {
-//            first_author_flag = Integer.parseInt(map.get("first_author").toString());
-//        }
-//        String author = expert.getName();
-//
-//        if (first_author_flag == 0) {
-//            matcher.withMatcher("experts", ExampleMatcher.GenericPropertyMatcher::contains);
-//            tmpDoc.setExperts(author);
-//        }
-//        else {
-//            matcher.withMatcher("first_author", ExampleMatcher.GenericPropertyMatcher::contains);
-//            tmpDoc.setFirst_author(author);
-//        }
-//
-//
-//        Example<Document> example = Example.of(tmpDoc, matcher);
-//        List<Document> docs = documentRepository.findAll(example);
-//
-//        String sc_sort = "";
-//        if (map.get("sc_sort") != null) {
-//            sc_sort = map.get("sc_sort").toString();
-//        }
-//
-//        if (sc_sort.equals("time")) {
-//            docs.sort(Comparator.comparing(Document::getDate));
-//        }
-//        else if (sc_sort.equals("cited")) {
-//            docs.sort(Comparator.comparing(Document::getCitedQuantity));
-//        }
-//
-//        int page = 0;
-//        if (map.get("page") != null) {
-//            page = Integer.parseInt(map.get("page").toString());
-//        }
-//
-//        List<ScRelateDoc> list = new ArrayList<>();
-//        /** unfinished */
-//        for (int i = 10 * (page-1); i < Math.min(docs.size(), 10 * page); i++) {
-//            ScRelateDoc scRelateDoc = new ScRelateDoc();
-//            Document doc = docs.get(i);
-//            scRelateDoc.setDocId(doc.getDocumentID());
-//            scRelateDoc.setTitled(doc.getTitle());
-//            scRelateDoc.setAuthors(doc.getExperts());
-//            scRelateDoc.setCited(doc.getCitedQuantity());
-//            scRelateDoc.setSummary(doc.getSummary());
-//            list.add(scRelateDoc);
-//        }
-//
-//        return Result.Success(list);
-//    }
 
     /** 关注、取消关注 */
     @GetMapping("/scholar/focusScholar")
