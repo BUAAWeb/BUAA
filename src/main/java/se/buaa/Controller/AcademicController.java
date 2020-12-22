@@ -282,10 +282,10 @@ public class AcademicController {
         String origin = searchWords.getOrigin();
 
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-
+        System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(keywords,//keywords,//"*" + keywords + "*",
-                    "title.keyword","summary.keyword");
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("*" + searchWords1 + "*",//keywords,//"*" + keywords + "*",
+                    "title","summary.keyword");
             boolQueryBuilder.must(queryBuilder);
         }
         if(title != null&& !title.equals("")){
