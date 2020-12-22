@@ -32,6 +32,7 @@ import se.buaa.Entity.CollectionKey;
 import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.ESDocument.ES_Document;
+import se.buaa.Entity.ESDocument.ES_Expert;
 import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Response.Result;
 import se.buaa.FontEntity.*;
@@ -293,7 +294,7 @@ public class AcademicController {
         if(experts != null){
             QueryBuilder queryBuilder;
             experts  = experts.replaceAll("[,，\\s;.。]+","*");
-//            System.out.println(experts);
+            System.out.println(experts);
             queryBuilder = QueryBuilders.wildcardQuery( "experts","*" + experts + "*");
             boolQueryBuilder.must(queryBuilder);
         }
@@ -314,7 +315,15 @@ public class AcademicController {
 
         Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
         List<ES_Document> es_documentList = es_documents.toList();
-
+        //如果只搜作者，添加返回作者列表
+        if((keywords==null||keywords=="")&&experts!=null){// TODO: 2020-12-22 org
+            List<String> expertList=new ArrayList<>();
+            expertList.add(experts);
+            PageRequest page = PageRequest.of(1, 6);
+            Page<ES_Expert> es_experts = es_expertDao.findByNameIn(page,experts);
+            List<ES_Expert> es_expertList = es_experts.toList();
+            data.setExpert_list(es_expertList);
+        }
         data.setTotal((int) es_documents.getTotalElements());
         data.setResult_list(es_documentList);
         return data;
@@ -450,8 +459,8 @@ public class AcademicController {
         if(post.getPage() == null)
             post.setPage("1");
 
-        if(post.getUserID() == null || post.getUserID().equals("-1"))
-            return CodeEnum.noUser;
+//        if(post.getUserID() == null || post.getUserID().equals("-1"))
+//            return CodeEnum.noUser;
 
         if(post.getSort() == null)
             return CodeEnum.noSort;
@@ -612,7 +621,10 @@ public class AcademicController {
         data.filter_list.add(getTimeFilter(search_word,typeList));
         data.filter_list.add(getTypeFilter(search_word,typeList));
         Date date2=new Date();
+
+
         data.time= (int) (date2.getTime()-date1.getTime());
+
         return new Result<>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
     }
     private Filter getTimeFilter(SearchWords searchWords,List<String> typeList){
