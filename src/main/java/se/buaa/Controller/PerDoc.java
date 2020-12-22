@@ -31,18 +31,14 @@ public class PerDoc {
     @RequestMapping("/getCollectionList")
     public Result getCollectionList(@RequestParam("userID")int id)
     {
-        ExampleMatcher matcher = ExampleMatcher.matching()
-                .withMatcher("userid", ExampleMatcher.GenericPropertyMatcher::exact)
-                .withIgnorePaths("documentid");
-
-        Collection tmpCollection = new Collection(new CollectionKey(id,null));
-        Example<Collection> example = Example.of(tmpCollection,matcher);
-        List<Collection> collections=collectionRepository.findAll(example);
+        List<Collection> collections=collectionRepository.findCollectionsByCollectionKey_Userid(id);
         List<CoFile> CoFileList= new ArrayList<>();
         ES_Document tmp;
         for(Collection collection:collections)
         {
             tmp = es_documentDao.findByDocumentid(collection.getCollectionKey().getDocumentid());
+            if(tmp == null)
+                continue;
             CoFileList.add(new CoFile(tmp.getDocumentid(),tmp.getTitle()));
         }
         return Result.Success(CoFileList);
