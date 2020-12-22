@@ -591,7 +591,7 @@ public class AcademicController {
         int totalPage = total % pageSize == 0 ? total / pageSize : total / pageSize + 1;
         if(totalPage == 0&&data.getExpert_list().size()==0)
             return new Result<Data>(CodeEnum.noResult.getCode(),CodeEnum.noResult.toString(),new Data());
-        if( totalPage < pageNum )
+        if( totalPage < pageNum &&data.getExpert_list().size()==0)
             return new Result<Data>(CodeEnum.pageOutOfRange.getCode(),CodeEnum.pageOutOfRange.toString(),new Data());
 
         for (ES_Document es_document : data.getResult_list()) {
