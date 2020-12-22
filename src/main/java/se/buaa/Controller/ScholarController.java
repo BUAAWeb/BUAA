@@ -38,25 +38,10 @@ public class ScholarController {
     @GetMapping("/scholar/getCoAuthors")
     public Result getcoAuthors(@RequestParam("scholar_id") String scholar_id){
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
-
-        ExampleMatcher matcher = ExampleMatcher.matching()
-                .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
-                .withIgnorePaths("id").withIgnorePaths("documentid");
-        // 可视情况使用ES进行优化
-        Document_Expert tmpRelation = new Document_Expert();
-        tmpRelation.setExpertID(scholar_id);
-        Example<Document_Expert> example = Example.of(tmpRelation,matcher);
-        List<Document_Expert> all_docs = docu_expertRepository.findAll(example);
-
-        matcher = ExampleMatcher.matching()
-                .withMatcher("documentid", ExampleMatcher.GenericPropertyMatcher::exact)
-                .withIgnorePaths("id").withIgnorePaths("expertid");
+        List<Document_Expert> all_docs = docu_expertRepository.findDocument_ExpertsByExpertID(scholar_id);
         List<Document_Expert> this_experts;
-
         for(Document_Expert doc:all_docs){
-            tmpRelation.setDocumentID(doc.getDocumentID());
-            example = Example.of(tmpRelation,matcher);
-            this_experts = docu_expertRepository.findAll(example);
+            this_experts = docu_expertRepository.findDocument_ExpertsByDocumentID(doc.getDocumentID());
             for(Document_Expert One_expert:this_experts){
                 String expert_id = One_expert.getExpertID();
                 if(expert_id.equals(scholar_id))
@@ -100,21 +85,9 @@ public class ScholarController {
     @GetMapping("/scholar/getCoAffiliate")
     public Result getcoAffiliate(@RequestParam("scholar_id") String scholar_id) {
         Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
-//        ExampleMatcher matcher = ExampleMatcher.matching()
-//                .withMatcher("expertid", ExampleMatcher.GenericPropertyMatcher::exact)
-//                .withIgnorePaths("id").withIgnorePaths("documentid");
-//        //可视情况使用ES进行优化
-//        Document_Expert tmpRelation=new Document_Expert();
-//        tmpRelation.setExpertID(scholar_id);
-//        Example<Document_Expert> example = Example.of(tmpRelation,matcher);
         List<Document_Expert> all_docs = docu_expertRepository.findDocument_ExpertsByExpertID(scholar_id);
-//        matcher = ExampleMatcher.matching()
-//                .withMatcher("documentid", ExampleMatcher.GenericPropertyMatcher::exact)
-//                .withIgnorePaths("id").withIgnorePaths("expertid");
         List<Document_Expert> this_experts;
         for(Document_Expert doc:all_docs){
-//            tmpRelation.setDocumentID(doc.getDocumentID());
-//            example = Example.of(tmpRelation,matcher);
             this_experts = docu_expertRepository.findDocument_ExpertsByDocumentID(doc.getDocumentID());
             for(Document_Expert One_expert:this_experts){
                 String expert_id = One_expert.getExpertID();
@@ -141,7 +114,7 @@ public class ScholarController {
                 Affiliate_count.put(org,Affiliate_count.get(org)+entry.getValue());
             }
             else{
-                Related_Experts.put(org,entry.getValue());
+                Affiliate_count.put(org,entry.getValue());
             }
         }
 
