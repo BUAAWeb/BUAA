@@ -114,7 +114,7 @@ public class ScholarController {
                 Affiliate_count.put(org,Affiliate_count.get(org)+entry.getValue());
             }
             else{
-                Related_Experts.put(org,entry.getValue());
+                Affiliate_count.put(org,entry.getValue());
             }
         }
 
