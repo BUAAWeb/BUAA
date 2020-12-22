@@ -822,7 +822,7 @@ public class AcademicController {
     }
     @RequestMapping("getById")
     public Result<ES_Document> getById(String document_id,String user_id){
-        if(user_id == null || user_id.equals("-1"))
+        if(user_id == null)
             return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
         if(document_id == null)
             return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
