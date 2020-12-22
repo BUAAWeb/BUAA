@@ -29,13 +29,13 @@ public class MessageController {
     }
 
     @GetMapping("/setMessageStatus")
-    public Result setMessageStatus(@RequestParam("messageID") Integer id, @RequestParam("token") String token){
+    public Result setMessageStatus(@RequestParam("messageID") Integer id, @RequestParam("token") String token, @RequestParam("status") boolean status){
         if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
         Optional<Message> Omessage = messageRepository.findById(id);
         Message message = Omessage.get();
-        message.is_read = true;
+        message.is_read = status;
         messageRepository.save(message);
         return Result.Success();
     }

@@ -119,16 +119,18 @@ public class ApplicationController {
         applicationRepository.save(applicationForm);
         Message message =new Message();
         message.date = new Date();
-        message.content = "您未能成功认领编号为";
+        message.objectID=applicationForm.objectID;
+        message.objectName=applicationForm.objectName;
         if(applicationForm.flag == 0){
-            message.content+= applicationForm.objectID+"的文献。\n";
+            message.type = "文献";
         }
         else{
-            message.content+= applicationForm.objectID+"的门户。\n";
+            message.type = "门户";
         }
-        message.content+="其原因为："+reason;
+        message.reason = reason;
+        message.success = false;
         message.userid = applicationForm.userID;
-        message.is_read =false;
+        message.is_read = false;
         messageRepository.save(message);
         return Result.Success();
     }
@@ -169,15 +171,17 @@ public class ApplicationController {
         applicationRepository.save(applicationForm);
         Message message =new Message();
         message.date = new Date();
-        message.content = "您已成功认领编号为";
+        message.objectID=applicationForm.objectID;
+        message.objectName=applicationForm.objectName;
         if(applicationForm.flag == 0){
-            message.content+= applicationForm.objectID+"的文献。";
+            message.type = "文献";
         }
         else{
-            message.content+= applicationForm.objectID+"的门户。";
+            message.type = "门户";
         }
+        message.success = true;
         message.userid = applicationForm.userID;
-        message.is_read =false;
+        message.is_read = false;
         messageRepository.save(message);
         return Result.Success();
     }
