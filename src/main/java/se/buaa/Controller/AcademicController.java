@@ -273,7 +273,9 @@ public class AcademicController {
 
     Data getSearchResult(SearchWords searchWords,String sort,List<String> typeList, int pageNum){
         Data data = new Data();
-        String keywords = searchWords.getKw();
+        String searchWords1 = searchWords.getSearchWords();
+        String title = searchWords.getTitle();
+        String keywords = searchWords.getKeywords();
         String startYear = searchWords.getStartTime();
         String endYear = searchWords.getEndTime();
         String experts = searchWords.getExperts();
@@ -281,9 +283,17 @@ public class AcademicController {
 
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 
-        if(keywords != null&&keywords!=""){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("*" + keywords + "*",//keywords,//"*" + keywords + "*",
-                    "title","summary");
+        if(searchWords1 != null&& !searchWords1.equals("")){
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(keywords,//keywords,//"*" + keywords + "*",
+                    "title.keyword","summary.keyword");
+            boolQueryBuilder.must(queryBuilder);
+        }
+        if(title != null&& !title.equals("")){
+            QueryBuilder queryBuilder = QueryBuilders.wildcardQuery( "title","*" + origin + "*");
+            boolQueryBuilder.must(queryBuilder);
+        }
+        if(keywords != null&& !keywords.equals("")){
+            QueryBuilder queryBuilder = QueryBuilders.wildcardQuery( "title","*" + origin + "*");//es still has some problems,so we can't search keywords now!
             boolQueryBuilder.must(queryBuilder);
         }
         if(startYear != null && endYear != null){
@@ -291,14 +301,14 @@ public class AcademicController {
                     .includeUpper(true).includeLower(true);
             boolQueryBuilder.must(queryBuilder);
         }
-        if(experts != null&&experts!=""){
+        if(experts != null&& !experts.equals("")){
             QueryBuilder queryBuilder;
             experts  = experts.replaceAll("[,，\\s;.。]+","*");
             System.out.println(experts);
             queryBuilder = QueryBuilders.wildcardQuery( "experts","*" + experts + "*");
             boolQueryBuilder.must(queryBuilder);
         }
-        if(origin != null&&origin!=""){
+        if(origin != null&& !origin.equals("")){
             QueryBuilder queryBuilder = QueryBuilders.wildcardQuery( "origin","*" + origin + "*");
             boolQueryBuilder.must(queryBuilder);
         }
@@ -459,8 +469,8 @@ public class AcademicController {
         if(post.getPage() == null)
             post.setPage("1");
 
-//        if(post.getUserID() == null || post.getUserID().equals("-1"))
-//            return CodeEnum.noUser;
+        if(post.getUserID() == null )
+            return CodeEnum.noUser;
 
         if(post.getSort() == null)
             return CodeEnum.noSort;
@@ -812,7 +822,7 @@ public class AcademicController {
     }
     @RequestMapping("getById")
     public Result<ES_Document> getById(String document_id,String user_id){
-        if(user_id == null || user_id.equals("-1"))
+        if(user_id == null)
             return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
         if(document_id == null)
             return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
