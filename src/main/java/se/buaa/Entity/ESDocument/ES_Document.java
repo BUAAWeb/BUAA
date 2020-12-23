@@ -6,19 +6,26 @@ import lombok.*;
 import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
 import org.sonatype.guice.bean.reflect.IgnoreSetters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.stereotype.Controller;
+import se.buaa.Controller.AcademicController;
 import se.buaa.Dao.ES_ExpertDao;
 import se.buaa.Entity.Expert;
+import se.buaa.Entity.Relation.Document_Expert;
+import se.buaa.Repository.Docu_ExpertRepository;
 import se.buaa.Repository.ExpertRepository;
+import se.buaa.Util.SpringContextUtil;
 
 import javax.persistence.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Data
 @Document(indexName = "document3",indexStoreType = "doc")
@@ -120,9 +127,6 @@ public class ES_Document {
         this.views = views;
     }
 
-    public void setEs_expertDao(ES_ExpertDao es_expertDao) {
-        this.es_expertDao = es_expertDao;
-    }
 
     public String getId() {
         return id;
@@ -175,26 +179,22 @@ public class ES_Document {
     public int getViews() {
         return views;
     }
-
-    public ES_ExpertDao getEs_expertDao() {
-        return es_expertDao;
-    }
     @Transient
     private List<ES_Expert> authors = new ArrayList<>();
     @Transient
     private List<String> keywordList = new ArrayList<>();
-
 //    @Transient
-//    private int views ;
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    @Autowired
-    ES_ExpertDao es_expertDao;
+//    public Docu_ExpertRepository docu_expertRepository;
+//    @Transient
+//    public ES_ExpertDao es_expertDao;
 
     @PersistenceConstructor
     public ES_Document(String dtype,String id, String title, String experts, String keywords, String summary,
                        String link, int cited_quantity, String origin,
                        String time){
+//        ApplicationContext applicationContext = SpringContextUtil.getApplicationContext();
+//        docu_expertRepository = applicationContext.getBean(Docu_ExpertRepository.class);
+//        es_expertDao = applicationContext.getBean(ES_ExpertDao.class);
         this.documentid = id;
         this.title = title;
         this.experts = experts;
@@ -207,18 +207,27 @@ public class ES_Document {
         String[] authorNames = experts.split("[,，\\s;.。]+");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
-            ES_Expert expert = new ES_Expert();
-            expert.setName(author);
-            this.authors.add(expert);
+            if(!Pattern.matches("\\s*",author)) {
+                ES_Expert es_expert;
+                Document_Expert document_expert = AcademicController.academicController.getDocu_expertRepository().
+                        findByDocumentIDAndExpertName(documentid, author);
+                if(document_expert != null) {
+                    es_expert = AcademicController.academicController.getEs_expertDao().
+                            findByExpertid(document_expert.getExpertID());
+                    if (es_expert == null) {
+                        es_expert = new ES_Expert();
+                        es_expert.setName(author);
+                    }
+                }
+                else {
+                    es_expert = new ES_Expert();
+                    es_expert.setName(author);
+                }
+                this.authors.add(es_expert);
+            }
         }
         String[] keyword = keywords.split("[,，\\s;.。]+");
         this.keywordList.addAll(Arrays.asList(keyword));
-//        if(time == null)
-//            this.time = null;
-//        else {
-//            System.out.println(time);
-////            this.time = new SimpleDateFormat("yyyy-MM-dd").parse(time);
-//        }
         this.origin = origin;
         this.views = 0;
 //        System.out.println(this.authors);
