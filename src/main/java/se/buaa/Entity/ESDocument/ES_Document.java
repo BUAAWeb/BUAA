@@ -128,6 +128,7 @@ public class ES_Document {
     }
 
 
+
     public String getId() {
         return id;
     }
@@ -192,9 +193,6 @@ public class ES_Document {
     public ES_Document(String dtype,String id, String title, String experts, String keywords, String summary,
                        String link, int cited_quantity, String origin,
                        String time){
-//        ApplicationContext applicationContext = SpringContextUtil.getApplicationContext();
-//        docu_expertRepository = applicationContext.getBean(Docu_ExpertRepository.class);
-//        es_expertDao = applicationContext.getBean(ES_ExpertDao.class);
         this.documentid = id;
         this.title = title;
         this.experts = experts;
@@ -228,6 +226,12 @@ public class ES_Document {
         }
         String[] keyword = keywords.split("[,，\\s;.。]+");
         this.keywordList.addAll(Arrays.asList(keyword));
+//        if(time == null)
+//            this.time = null;
+//        else {
+//            System.out.println(time);
+////            this.time = new SimpleDateFormat("yyyy-MM-dd").parse(time);
+//        }
         this.origin = origin;
         this.views = 0;
 //        System.out.println(this.authors);
