@@ -111,7 +111,7 @@ public class PerInfo {
     @ResponseBody
     public Result isAdmin(@RequestParam String token){
         Map map= JwtUtils.parseToken(token);
-        boolean is_admin = (Boolean) map.get("is_admin");
+        boolean is_admin =(int)map.get("is_admin")==1;
         if (is_admin)
             return Result.Success();
         else

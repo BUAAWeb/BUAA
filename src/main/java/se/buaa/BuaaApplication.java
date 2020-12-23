@@ -3,7 +3,6 @@ package se.buaa;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import se.buaa.Controller.AcademicController;
-import se.buaa.Error.ErrorDict;
 
 import java.util.List;
 
