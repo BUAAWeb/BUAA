@@ -908,6 +908,7 @@ public class AcademicController {
                 if(mapValue==es_keyword.view){
                     es_keyword.keyword=mapKey;
                     row.add(es_keyword);
+                    break;
                 }
             }
 
