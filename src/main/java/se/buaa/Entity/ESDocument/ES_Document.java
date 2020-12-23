@@ -192,14 +192,14 @@ public class ES_Document {
         this.cited_quantity = cited_quantity;
         this.time = time;
         this.dtype = dtype;
-        String[] authorNames = experts.split(",");
+        String[] authorNames = experts.split("[,，\\s;.。]+");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
             ES_Expert expert = new ES_Expert();
             expert.setName(author);
             this.authors.add(expert);
         }
-        String[] keyword = keywords.split(",");
+        String[] keyword = keywords.split("[,，\\s;.。]+");
         this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)
 //            this.time = null;
