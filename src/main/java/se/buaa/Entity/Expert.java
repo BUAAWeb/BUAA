@@ -17,7 +17,7 @@ public class Expert {
     @Column(name = "cited_times")
     private Integer cited_Times;
     @Column(name = "achievements")//成果数
-    private int achievements;
+    private Integer achievements;
     @Column(name = "views")
     private Integer views;
     @Column(name = "is_verified")
@@ -33,7 +33,7 @@ public class Expert {
         this.isVerified = isVerified;
     }
 
-    public int getViews() {
+    public Integer getViews() {
         return views;
     }
 
@@ -45,11 +45,11 @@ public class Expert {
         return name;
     }
 
-    public int getCited_Times() {
+    public Integer getCited_Times() {
         return cited_Times;
     }
 
-    public int getAchievements() {
+    public Integer getAchievements() {
         return achievements;
     }
 
