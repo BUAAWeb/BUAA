@@ -31,12 +31,14 @@ import se.buaa.Entity.Collection;
 import se.buaa.Entity.CollectionKey;
 import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
+import se.buaa.Entity.Document;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.ESDocument.ES_Expert;
 import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Response.Result;
 import se.buaa.FontEntity.*;
 import se.buaa.Repository.CollectionRepository;
+import se.buaa.Repository.DocumentRepository;
 import se.buaa.Service.ES_DocumentService;
 
 //import java.net.http.HttpRequest;
@@ -60,6 +62,8 @@ public class AcademicController {
 
     @Autowired
     CollectionRepository collectionRepository;
+    @Autowired
+    DocumentRepository documentRepository;
 
     public static List<String> typeListDefault = new ArrayList<>();
 
@@ -284,18 +288,19 @@ public class AcademicController {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( searchWords1 ,
-                    "title"//"*" + keywords + "*",
-                    );
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",searchWords1).slop(0);
+
+//            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*"+searchWords1+ "*" ,
+//                    "title","keyword.keyword"//"*" + keywords + "*",
+//                    );
             boolQueryBuilder.must(queryBuilder);
         }
         if(title != null&& !title.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + title + "*","title");
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",title).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(keywords != null&& !keywords.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + keywords + "*","title");//es still has some problems,so we can't search keywords now!
-            boolQueryBuilder.must(queryBuilder);
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("keyword",keywords).slop(0);            boolQueryBuilder.must(queryBuilder);
         }
         if(startYear != null && endYear != null){
             QueryBuilder queryBuilder = QueryBuilders.rangeQuery("time").from(startYear).to(endYear)
@@ -303,14 +308,14 @@ public class AcademicController {
             boolQueryBuilder.must(queryBuilder);
         }
         if(experts != null&& !experts.equals("")){
-            QueryBuilder queryBuilder;
+
             experts  = experts.replaceAll("[,，\\s;.。]+","*");
-            System.out.println(experts);
-            queryBuilder = QueryBuilders.wildcardQuery( "experts","*" + experts + "*");
+
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("experts",experts).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(origin != null&& !origin.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + origin + "*","origin");
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("origin",origin).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(typeList.size() == 1){
@@ -330,7 +335,7 @@ public class AcademicController {
         if((keywords==null||keywords=="")&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
             List<String> expertList=new ArrayList<>();
             expertList.add(experts);
-            PageRequest page = PageRequest.of(1, 6);
+            PageRequest page = PageRequest.of(0, 6);
             Page<ES_Expert> es_experts = es_expertDao.findByNameIn(page,experts);
             List<ES_Expert> es_expertList = es_experts.toList();
             data.setExpert_list(es_expertList);
@@ -841,6 +846,9 @@ public class AcademicController {
             }
             es_document.setViews(es_document.getViews()+1);
             es_documentDao.save(es_document);
+            Document document=documentRepository.findDocumentByDocumentID(document_id);
+            document.setView(document.getView()+1);
+            documentRepository.save(document);
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
 

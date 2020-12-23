@@ -31,6 +31,22 @@ public class Document {
     @Transient  //<-非数据库字段
     private List<Expert> expertList ;
 
+    public void setCitedQuantity(Integer citedQuantity) {
+        this.citedQuantity = citedQuantity;
+    }
+
+    public void setDocument_type(Integer document_type) {
+        this.document_type = document_type;
+    }
+
+    public int getView() {
+        return view;
+    }
+
+    public void setView(int view) {
+        this.view = view;
+    }
+
     public String getDate() {
         return date;
     }
