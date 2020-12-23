@@ -284,16 +284,17 @@ public class AcademicController {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("*" + searchWords1 + "*",//keywords,//"*" + keywords + "*",
-                    "title","summary.keyword");
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( searchWords1 ,
+                    "title"//"*" + keywords + "*",
+                    );
             boolQueryBuilder.must(queryBuilder);
         }
         if(title != null&& !title.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.wildcardQuery( "title","*" + origin + "*");
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + title + "*","title");
             boolQueryBuilder.must(queryBuilder);
         }
         if(keywords != null&& !keywords.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.wildcardQuery( "title","*" + origin + "*");//es still has some problems,so we can't search keywords now!
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + keywords + "*","title");//es still has some problems,so we can't search keywords now!
             boolQueryBuilder.must(queryBuilder);
         }
         if(startYear != null && endYear != null){
@@ -309,7 +310,7 @@ public class AcademicController {
             boolQueryBuilder.must(queryBuilder);
         }
         if(origin != null&& !origin.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.wildcardQuery( "origin","*" + origin + "*");
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + origin + "*","origin");
             boolQueryBuilder.must(queryBuilder);
         }
         if(typeList.size() == 1){
@@ -322,7 +323,7 @@ public class AcademicController {
                 .withQuery(boolQueryBuilder)
                 .withPageable(PageRequest.of(pageNum - 1, pageSize,sort1))
                 .build();
-
+        System.out.println(searchQuery.toString());
         Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
         List<ES_Document> es_documentList = es_documents.toList();
         //如果只搜作者，添加返回作者列表
@@ -351,8 +352,8 @@ public class AcademicController {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 
         if(keywords != null){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("*" + keywords + "*",//keywords,//"*" + keywords + "*",
-                    "title","summary");
+            QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("*" + keywords + "*",//keywords,//"*" + keywords + "*",
+                    "title");
             boolQueryBuilder.must(queryBuilder);
         }
         if(startYear != null && endYear != null){
