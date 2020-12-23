@@ -272,8 +272,8 @@ public class AcademicController {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( searchWords1 ,
-                    "title"//"*" + keywords + "*",
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + searchWords1 + "*"  ,
+                    "title","keywords"//,"keywords.keyword"//"*" + keywords + "*",
                     );
             boolQueryBuilder.must(queryBuilder);
         }
@@ -282,7 +282,7 @@ public class AcademicController {
             boolQueryBuilder.must(queryBuilder);
         }
         if(keywords != null&& !keywords.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + keywords + "*","title");//es still has some problems,so we can't search keywords now!
+            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + keywords + "*","keywords");//es still has some problems,so we can't search keywords now!
             boolQueryBuilder.must(queryBuilder);
         }
         if(startYear != null && endYear != null){
@@ -315,7 +315,7 @@ public class AcademicController {
         Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
         List<ES_Document> es_documentList = es_documents.toList();
         //如果只搜作者，添加返回作者列表
-        if((keywords==null||keywords=="")&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
+        if((keywords==null|| keywords.equals(""))&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
             List<String> expertList=new ArrayList<>();
             expertList.add(experts);
             PageRequest page = PageRequest.of(1, 6);
@@ -601,14 +601,8 @@ public class AcademicController {
             }
         }
 
-        data.setResult_list(documentsList);
-        data.setTotal(total);
-
-        String year=search_word.getEndTime();
-        Filter filter=getTimeFilter(search_word,typeList);
-        data.filter_list.add(filter);
-        filter=getTypeFilter(search_word,typeList);
-        data.filter_list.add(filter);
+        data.filter_list.add(getTimeFilter(search_word,typeList));
+        data.filter_list.add(getTypeFilter(search_word,typeList));
         return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
 //        data.setTotal();
 //        if(sortWay.compareTo("cited")==0){
@@ -634,14 +628,6 @@ public class AcademicController {
 //
 //        data.setResult_list(documentsList);
 //        data.setTotal(total);
-        data.filter_list.add(getTimeFilter(search_word,typeList));
-        data.filter_list.add(getTypeFilter(search_word,typeList));
-        Date date2=new Date();
-
-
-        data.time= (int) (date2.getTime()-date1.getTime());
-
-        return new Result<>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
     }
     private Filter getTimeFilter(SearchWords searchWords,List<String> typeList){
         Filter filter=new Filter();

@@ -51,14 +51,15 @@ public class ES_DocumentServiceImpl implements ES_DocumentService {
 
     @Override
     public List<ES_Document> findByKeywordsIn(List<String> keywords) {
-        List<ES_Document> es_documentList = new ArrayList<>();
-        for(String keyword : keywords){
-            List<ES_Document> es_documentList1 = es_documentDao.findByKeywordsIn(keyword);
-            if(es_documentList1 != null)
-                es_documentList.addAll(es_documentList1);
-        }
-        removeDuplicate(es_documentList);
-        return es_documentList;
+//        List<ES_Document> es_documentList = new ArrayList<>();
+//        for(String keyword : keywords){
+//            List<ES_Document> es_documentList1 = es_documentDao.findByKeywordsIn(keyword);
+//            if(es_documentList1 != null)
+//                es_documentList.addAll(es_documentList1);
+//        }
+//        removeDuplicate(es_documentList);
+//        return es_documentList;
+        return null;
     }
 
     @Override

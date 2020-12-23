@@ -27,14 +27,13 @@ public class ES_Document {
     private String id;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String documentid;
-    @Field(analyzer = "ik_smart", type = FieldType.Text)
+    @Field(index = false, type = FieldType.Keyword)
     private String title;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String dtype;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
 //    @Field(analyzer = "ik_smart",type = FieldType.Keyword)
-    @Field(index = true, type = FieldType.Keyword)
     @Field(index = true, type = FieldType.Keyword)
     private String experts;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
@@ -110,9 +109,7 @@ public class ES_Document {
         this.views = views;
     }
 
-    public void setEs_expertDao(ES_ExpertDao es_expertDao) {
-        this.es_expertDao = es_expertDao;
-    }
+
 
     public String getId() {
         return id;
@@ -166,9 +163,6 @@ public class ES_Document {
         return views;
     }
 
-    public ES_ExpertDao getEs_expertDao() {
-        return es_expertDao;
-    }
     @Transient
     private List<ES_Expert> authors = new ArrayList<>();
     @Transient
