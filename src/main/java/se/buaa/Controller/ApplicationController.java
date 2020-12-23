@@ -61,7 +61,7 @@ public class ApplicationController {
             if (expert.isVerified==1)
                 return Result.Error("201","门户已被认领");
             if (user.isVerified==1){
-                return Result.Error("201","您已认领门户，请勿重复认领！");
+                return Result.Error("201","您已认领其他门户，请勿重复认领！");
             }
             applicationForm.objectName = expertRepository.findByExpertID(objectID).getName();
         }
