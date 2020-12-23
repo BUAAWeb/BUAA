@@ -470,7 +470,7 @@ public class AcademicController {
             post.setPage("1");
 
         if(post.getUserID() == null )
-            return CodeEnum.noUser;
+            post.setUserID("-1");
 
         if(post.getSort() == null)
             return CodeEnum.noSort;
@@ -603,13 +603,15 @@ public class AcademicController {
             return new Result<Data>(CodeEnum.noResult.getCode(),CodeEnum.noResult.toString(),new Data());
         if( totalPage < pageNum &&data.getExpert_list().size()==0)
             return new Result<Data>(CodeEnum.pageOutOfRange.getCode(),CodeEnum.pageOutOfRange.toString(),new Data());
-
-        for (ES_Document es_document : data.getResult_list()) {
-            String doc_id = es_document.getId();
-            CollectionKey ck = new CollectionKey(Integer.parseInt(userID), doc_id);
-            Optional<Collection> res = collectionRepository.findById(ck);
-            es_document.setIs_favor(res.isPresent());
+        if(userID.compareTo("-1")!=0){
+            for (ES_Document es_document : data.getResult_list()) {
+                String doc_id = es_document.getId();
+                CollectionKey ck = new CollectionKey(Integer.parseInt(userID), doc_id);
+                Optional<Collection> res = collectionRepository.findById(ck);
+                es_document.setIs_favor(res.isPresent());
+            }
         }
+
 //        Iterable<ES_Document> searchResult = es_documentDao.findByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
 //                page1,search_word.getKw(),search_word.getExperts(),search_word.getOrigin(),search_word.getStartTime(),search_word.getEndTime(),typeList,
 //                search_word.getKw(),search_word.getExperts(),search_word.getOrigin(),search_word.getStartTime(),search_word.getEndTime(),typeList,
@@ -836,6 +838,8 @@ public class AcademicController {
                 Optional<Collection> res = collectionRepository.findById(collectionKey);
                 es_document.setIs_favor(res.isPresent());
             }
+            es_document.setViews(es_document.getViews()+1);
+            es_documentDao.save(es_document);
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
 
