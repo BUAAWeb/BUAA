@@ -847,9 +847,6 @@ public class AcademicController {
             }
             es_document.setViews(es_document.getViews()+1);
             es_documentDao.save(es_document);
-            Document document=documentRepository.findDocumentByDocumentID(document_id);
-            document.setView(document.getView()+1);
-            documentRepository.save(document);
             return new Result<>(CodeEnum.success.getCode(), CodeEnum.success.toString(),es_document);
         }
 
@@ -877,7 +874,15 @@ public class AcademicController {
     }
     @GetMapping("getHotKeywords")
     public Result<ES_Keyword> getHotKeywords(){
-        List<ES_Document> es_documentList=es_documentDao.findTop10ByViews();
+
+
+        Sort sort1 = getSort("1");
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withPageable(PageRequest.of(0, pageSize,sort1))
+                .build();
+
+        Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
+        List<ES_Document> es_documentList = es_documents.toList();
         Map<String,Integer> map=new HashMap<>();
         for(int i=0;i<10;i++){
             int l=es_documentList.get(i).getKeywordList().size();
@@ -907,7 +912,7 @@ public class AcademicController {
             }
 
         }
-        return new Result("200", CodeEnum.success.toString(), row);
+        return new Result("200", CodeEnum.success.toString(),row);
     }
     public static List<Integer> getMax10Value(Map<String, Integer> map) {
         if (map == null)
