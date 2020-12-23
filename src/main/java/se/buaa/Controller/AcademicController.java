@@ -550,6 +550,8 @@ public class AcademicController {
                 order = Sort.Order.desc("cited_quantity"); break;
             case "citedNum":
                 order = Sort.Order.desc("citedNum"); break;
+            case "view":
+                order = Sort.Order.desc("view"); break;
             default:
                 order = Sort.Order.desc("views");
         }
