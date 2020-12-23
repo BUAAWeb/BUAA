@@ -97,62 +97,62 @@ public class ScholarController {
 //    }
 
 
-    @GetMapping("/scholar/getCoAffiliate")
-    public Result getcoAffiliate(@RequestParam("scholar_id") String scholar_id) {
-        Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
-        List<Document_Expert> all_docs = docu_expertRepository.findDocument_ExpertsByExpertID(scholar_id);
-        List<Document_Expert> this_experts;
-        for(Document_Expert doc:all_docs){
-            this_experts = docu_expertRepository.findDocument_ExpertsByDocumentID(doc.getDocumentID());
-            for(Document_Expert One_expert:this_experts){
-                String expert_id = One_expert.getExpertID();
-                if(expert_id.equals(scholar_id))
-                    continue;
-                if(Related_Experts.containsKey(expert_id)){
-                    Related_Experts.put(expert_id,Related_Experts.get(expert_id)+1);
-                }
-                else{
-                    Related_Experts.put(expert_id,1);
-                }
-            }
-        }
-        //为空直接返回
-        if(Related_Experts.isEmpty())
-            return Result.Success();
-        Map<String,Integer> Affiliate_count = new LinkedHashMap<String,Integer>();
-        Expert tmpExpert;
-        String org;
-        for (Map.Entry<String, Integer> entry : Related_Experts.entrySet()) {
-            tmpExpert = expertRepository.findByExpertID(entry.getKey());
-            org = tmpExpert.getOrg();
-            if(Affiliate_count.containsKey(org)){
-                Affiliate_count.put(org,Affiliate_count.get(org)+entry.getValue());
-            }
-            else{
-                Affiliate_count.put(org,entry.getValue());
-            }
-        }
-
-        //将map排序
-        ArrayList<Map.Entry<String,Integer>> l = new ArrayList<Map.Entry<String,Integer>>(Affiliate_count.entrySet());
-
-        l.sort(new Comparator<Map.Entry<String, Integer>>() {
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return (o2.getValue() - o1.getValue());
-            }
-        });
-        Iterator<Map.Entry<String, Integer>> iter = l.iterator();
-        List<Pair<String,Integer>> Affiliate_count_list = new ArrayList<>();
-        Map.Entry<String, Integer> tmpEntry = null;
-        for(int i=0;i<10;i++){
-            if(!iter.hasNext())
-                break;
-            tmpEntry = iter.next();
-            Affiliate_count_list.add(Pair.of(tmpEntry.getKey(),tmpEntry.getValue()));
-        }
-        return Result.Success(Affiliate_count_list);
-
-    }
+//    @GetMapping("/scholar/getCoAffiliate")
+//    public Result getcoAffiliate(@RequestParam("scholar_id") String scholar_id) {
+//        Map<String,Integer> Related_Experts = new LinkedHashMap<String,Integer>();
+//        List<Document_Expert> all_docs = docu_expertRepository.findDocument_ExpertsByExpertID(scholar_id);
+//        List<Document_Expert> this_experts;
+//        for(Document_Expert doc:all_docs){
+//            this_experts = docu_expertRepository.findDocument_ExpertsByDocumentID(doc.getDocumentID());
+//            for(Document_Expert One_expert:this_experts){
+//                String expert_id = One_expert.getExpertID();
+//                if(expert_id.equals(scholar_id))
+//                    continue;
+//                if(Related_Experts.containsKey(expert_id)){
+//                    Related_Experts.put(expert_id,Related_Experts.get(expert_id)+1);
+//                }
+//                else{
+//                    Related_Experts.put(expert_id,1);
+//                }
+//            }
+//        }
+//        //为空直接返回
+//        if(Related_Experts.isEmpty())
+//            return Result.Success();
+//        Map<String,Integer> Affiliate_count = new LinkedHashMap<String,Integer>();
+//        Expert tmpExpert;
+//        String org;
+//        for (Map.Entry<String, Integer> entry : Related_Experts.entrySet()) {
+//            tmpExpert = expertRepository.findByExpertID(entry.getKey());
+//            org = tmpExpert.getOrg();
+//            if(Affiliate_count.containsKey(org)){
+//                Affiliate_count.put(org,Affiliate_count.get(org)+entry.getValue());
+//            }
+//            else{
+//                Affiliate_count.put(org,entry.getValue());
+//            }
+//        }
+//
+//        //将map排序
+//        ArrayList<Map.Entry<String,Integer>> l = new ArrayList<Map.Entry<String,Integer>>(Affiliate_count.entrySet());
+//
+//        l.sort(new Comparator<Map.Entry<String, Integer>>() {
+//            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+//                return (o2.getValue() - o1.getValue());
+//            }
+//        });
+//        Iterator<Map.Entry<String, Integer>> iter = l.iterator();
+//        List<Pair<String,Integer>> Affiliate_count_list = new ArrayList<>();
+//        Map.Entry<String, Integer> tmpEntry = null;
+//        for(int i=0;i<10;i++){
+//            if(!iter.hasNext())
+//                break;
+//            tmpEntry = iter.next();
+//            Affiliate_count_list.add(Pair.of(tmpEntry.getKey(),tmpEntry.getValue()));
+//        }
+//        return Result.Success(Affiliate_count_list);
+//
+//    }
 
     /** 获取科研人员相关信息 */
     @GetMapping("/scholar/getInfo")
@@ -218,7 +218,7 @@ public class ScholarController {
         return getDataResult(scholar_id);
     }
 
-    @RequestMapping("/scholar/getCoAffiliate")
+    @GetMapping("/scholar/getCoAffiliate")
     public Result<Data> getCoAffiliate(String scholar_id){
         return getDataResult(scholar_id);
     }
