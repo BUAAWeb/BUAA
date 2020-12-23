@@ -207,9 +207,11 @@ public class ES_Document {
         String[] authorNames = experts.split("[,，\\s;.。]+");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
-            ES_Expert expert = new ES_Expert();
-            expert.setName(author);
-            this.authors.add(expert);
+            if(author!=null&&author!=""){
+                ES_Expert expert = new ES_Expert();
+                expert.setName(author);
+                this.authors.add(expert);
+            }
         }
         String[] keyword = keywords.split("[,，\\s;.。]+");
         this.keywordList.addAll(Arrays.asList(keyword));

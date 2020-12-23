@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import se.buaa.Config.JwtUtils;
 import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Dao.ES_ExpertDao;
+import se.buaa.Dao.ES_KeywordDao;
 import se.buaa.Entity.Collection;
 import se.buaa.Entity.CollectionKey;
 import se.buaa.Entity.Data.Data;
@@ -54,7 +55,8 @@ import java.util.*;
 public class AcademicController {
     @Autowired
     ES_DocumentDao es_documentDao;
-
+    @Autowired
+    ES_KeywordDao es_keywordDao;
     @Autowired
     ES_DocumentService es_documentService;
 
@@ -546,6 +548,8 @@ public class AcademicController {
                 order = Sort.Order.desc("time"); break;
             case "cited":
                 order = Sort.Order.desc("cited_quantity"); break;
+            case "citedNum":
+                order = Sort.Order.desc("citedNum"); break;
             default:
                 order = Sort.Order.desc("views");
         }
@@ -876,43 +880,44 @@ public class AcademicController {
     public Result<ES_Keyword> getHotKeywords(){
 
 
-        Sort sort1 = getSort("1");
+        Sort sort1 = getSort("citedNum");
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withPageable(PageRequest.of(0, pageSize,sort1))
                 .build();
-
-        Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
-        List<ES_Document> es_documentList = es_documents.toList();
-        Map<String,Integer> map=new HashMap<>();
-        for(int i=0;i<10;i++){
-            int l=es_documentList.get(i).getKeywordList().size();
-            List<String> keywordList=es_documentList.get(i).getKeywordList();
-            for(int j=0;j<l;j++){
-                if(map.containsKey(keywordList.get(j))){
-                    int v=map.get(keywordList.get(j));
-                    map.put(keywordList.get(j),v+1);
-                }
-                else {
-                    map.put(keywordList.get(j),1);
-                }
-            }
-        }
-        List<Integer> list=getMax10Value(map);
-        List<ES_Keyword> row=new ArrayList<>();
-        for(int i=0;i<10;i++){
-            ES_Keyword es_keyword=new ES_Keyword();
-            es_keyword.view=list.get(i);
-            for(Map.Entry<String, Integer> entry : map.entrySet()){
-                String mapKey = entry.getKey();
-                Integer mapValue = entry.getValue();
-                if(mapValue==es_keyword.view){
-                    es_keyword.keyword=mapKey;
-                    row.add(es_keyword);
-                    break;
-                }
-            }
-
-        }
+        Page<ES_Keyword> es_keywords = es_keywordDao.search(searchQuery);
+        List<ES_Keyword> row = es_keywords.toList();
+//        Map<String,Integer> map=new HashMap<>();
+//        for(int i=0;i<10;i++){
+//            int l=es_documentList.get(i).getKeywordList().size();
+//            List<String> keywordList=es_documentList.get(i).getKeywordList();
+//            for(int j=0;j<l;j++){
+//                if(map.containsKey(keywordList.get(j))){
+//                    int v=map.get(keywordList.get(j));
+//                    map.put(keywordList.get(j),v+1);
+//                }
+//                else {
+//                    map.put(keywordList.get(j),1);
+//                }
+//            }
+//        }
+//
+//        List<Integer> list=getMax10Value(map);
+//        List<ES_Keyword> row=new ArrayList<>();
+//        for(int i=0;i<10;i++){
+//            ES_Keyword es_keyword=new ES_Keyword();
+//            es_keyword.view=list.get(i);
+//            for(Map.Entry<String, Integer> entry : map.entrySet()){
+//                String mapKey = entry.getKey();
+//                Integer mapValue = entry.getValue();
+//                if(mapValue==es_keyword.view){
+//                    es_keyword.keyword=mapKey;
+//                    row.add(es_keyword);
+//                    map.remove(mapKey,mapValue);
+//                    break;
+//                }
+//            }
+//
+//        }
         return new Result("200", CodeEnum.success.toString(),row);
     }
     public static List<Integer> getMax10Value(Map<String, Integer> map) {
