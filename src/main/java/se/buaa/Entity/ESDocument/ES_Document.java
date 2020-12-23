@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Data
-@Document(indexName = "document2",indexStoreType = "doc")
+@Document(indexName = "document",indexStoreType = "doc")
 public class ES_Document {
     @Id
     private String id;
@@ -35,8 +35,8 @@ public class ES_Document {
     @Setter(AccessLevel.NONE)
 //    @Field(analyzer = "ik_smart",type = FieldType.Keyword)
     @Field(index = true, type = FieldType.Keyword)
+    @Field(index = true, type = FieldType.Keyword)
     private String experts;
-
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String keywords;
     @Field(analyzer = "ik_smart", type = FieldType.Text)//摘要
@@ -187,14 +187,14 @@ public class ES_Document {
         this.cited_quantity = cited_quantity;
         this.time = time;
         this.dtype = dtype;
-        String[] authorNames = experts.split(",");
+        String[] authorNames = experts.split("[,，\\s;.。]+");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
             ES_Expert expert = new ES_Expert();
             expert.setName(author);
             this.authors.add(expert);
         }
-        String[] keyword = keywords.split(",");
+        String[] keyword = keywords.split("[,，\\s;.。]+");
         this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)
 //            this.time = null;

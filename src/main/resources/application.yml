@@ -1,12 +1,11 @@
 spring:
-  data:
+#  data:
 #    elasticsearch:
 #      cluster-name: BUAA-application
 #      cluster-nodes: 49.232.157.22:9300
 #      repositories:
 #        enable: true
-  mvc:
-    static-path-pattern: /static/**
+
   datasource:
     url: jdbc:mysql://49.232.157.22:3306/BUAA
     username: BUAA

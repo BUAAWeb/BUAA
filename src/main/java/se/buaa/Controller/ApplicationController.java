@@ -10,6 +10,7 @@ import se.buaa.Dao.ES_DocumentDao;
 import se.buaa.Entity.ApplicationForm;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.Expert;
+import se.buaa.Entity.Message;
 import se.buaa.Entity.Relation.Document_Expert;
 import se.buaa.Entity.Response.Result;
 import se.buaa.Entity.User;
@@ -35,24 +36,26 @@ public class ApplicationController {
     Docu_ExpertRepository docu_expertRepository;
     @Autowired
     ES_DocumentDao es_documentDao;
+    @Autowired
+    MessageRepository messageRepository;
 
     @RequestMapping("create")
-    public Result create(@RequestBody createReq request){
-        if (JwtUtils.verifyToken(request.token)!=0){
+    public Result create(@RequestParam String token,int userID,String objectID,String email,int flag){
+        if (JwtUtils.verifyToken(token)!=0){
             return Result.Error("201","token非法，请重新登录");
         }
-        if (applicationRepository.findApplicationFormByUserIDAndObjectID(request.userID,request.objectID)!=null){
+        if (applicationRepository.findApplicationFormByUserIDAndObjectID(userID,objectID)!=null){
             return Result.Error("201","您的申请正在由管理员审核，请勿重复操作");
         }
         ApplicationForm applicationForm = new ApplicationForm();
-        applicationForm.email = request.email;
-        applicationForm.flag = request.flag;
-        applicationForm.objectID = request.objectID;
-        applicationForm.userID = request.userID;
-        applicationForm.userName = userRepository.findByUserID(request.userID).userName;
+        applicationForm.email = email;
+        applicationForm.flag = flag;
+        applicationForm.objectID = objectID;
+        applicationForm.userID = userID;
+        applicationForm.userName = userRepository.findByUserID(userID).userName;
         User user = userRepository.findByUserID(applicationForm.userID);
-        if (request.flag == 1){//门户
-            Expert expert = expertRepository.findByExpertID(request.objectID);
+        if (flag == 1){//门户
+            Expert expert = expertRepository.findByExpertID(objectID);
             if(expert==null)
                 return Result.Error("201","专家不存在");
             if (expert.isVerified==1)
@@ -60,11 +63,11 @@ public class ApplicationController {
             if (user.isVerified==1){
                 return Result.Error("201","您已认领门户，请勿重复认领！");
             }
-            applicationForm.objectName = expertRepository.findByExpertID(request.objectID).getName();
+            applicationForm.objectName = expertRepository.findByExpertID(objectID).getName();
         }
 
-        else if (request.flag==0){
-            ES_Document es_document = es_documentDao.findByDocumentid(request.objectID);
+        else if (flag==0){
+            ES_Document es_document = es_documentDao.findByDocumentid(objectID);
             if(es_document==null)
                 return Result.Error("201","文献不存在");
             if (user.isVerified!=1){
@@ -114,6 +117,21 @@ public class ApplicationController {
         applicationForm.result = 2;
         applicationForm.msg = reason;
         applicationRepository.save(applicationForm);
+        Message message =new Message();
+        message.date = new Date();
+        message.objectID=applicationForm.objectID;
+        message.objectName=applicationForm.objectName;
+        if(applicationForm.flag == 0){
+            message.type = "文献";
+        }
+        else{
+            message.type = "门户";
+        }
+        message.reason = reason;
+        message.success = false;
+        message.userid = applicationForm.userID;
+        message.is_read = false;
+        messageRepository.save(message);
         return Result.Success();
     }
     @RequestMapping("agree")
@@ -151,6 +169,20 @@ public class ApplicationController {
         else return Result.Error("201","flag参数错误");
         applicationForm.result = 1;
         applicationRepository.save(applicationForm);
+        Message message =new Message();
+        message.date = new Date();
+        message.objectID=applicationForm.objectID;
+        message.objectName=applicationForm.objectName;
+        if(applicationForm.flag == 0){
+            message.type = "文献";
+        }
+        else{
+            message.type = "门户";
+        }
+        message.success = true;
+        message.userid = applicationForm.userID;
+        message.is_read = false;
+        messageRepository.save(message);
         return Result.Success();
     }
     public static class createReq{
@@ -159,26 +191,6 @@ public class ApplicationController {
         public String objectID;
         public int flag;
         public String email;
-    }
-
-
-    public static class getAllReq{
-        public int size;
-        public int page;
-        public boolean isAll;
-        public String token;
-        public int flag;
-
-    }
-    public static class rejectReq{
-        public String token;
-        public int formID;
-        public String reason;
-
-    }
-    public static class agreeReq{
-        public String token;
-        public int formID;
     }
     public static class getAllRes{
         public int totalPages;

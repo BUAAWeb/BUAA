@@ -4,19 +4,39 @@ import lombok.Data;
 
 @Data
 public class SearchWords {
-    String kw;
+    String searchWords;
+    String title;
+    String keywords;
     String experts;
     String origin;
     String startTime;
     String endTime;
 
-    public String getKw() {
-        return kw;
+    public String getSearchWords() {
+        return searchWords;
     }
 
-    public void setKw(String kw) {
-        this.kw = kw;
+    public void setSearchWords(String searchWords) {
+        this.searchWords = searchWords;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
+    }
+//    public SearchWords copy()
+
 
     public String getExperts() {
         return experts;
