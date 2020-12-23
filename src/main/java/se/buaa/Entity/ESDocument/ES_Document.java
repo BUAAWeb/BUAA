@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Data
-@Document(indexName = "document2",indexStoreType = "doc")
+@Document(indexName = "document3",indexStoreType = "doc")
 public class ES_Document {
     @Id
     private String id;
@@ -51,6 +51,18 @@ public class ES_Document {
 //    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private String time;
     private boolean is_favor=false;
+
+    public void setAuthors(List<ES_Expert> authors) {
+        this.authors = authors;
+    }
+
+    public List<String> getKeywordList() {
+        return keywordList;
+    }
+
+    public void setKeywordList(List<String> keywordList) {
+        this.keywordList = keywordList;
+    }
 
     public String getDtype() {
         return dtype;

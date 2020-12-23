@@ -60,6 +60,7 @@ public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Lo
     List<ES_Document> findByKeywordsLike(String keyword);
     List<ES_Document> findByKeywords(String keyword);
     List<ES_Document> findByTitleLike(String title);
+    List<ES_Document> findTop10ByViews();
     Page<ES_Document> findAll(Pageable page);
     List<ES_Document> findByKeywordsIn(String keywords);
     Page<ES_Document> findByExpertsIn(Pageable page,List<String> experts);

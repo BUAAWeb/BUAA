@@ -31,12 +31,15 @@ import se.buaa.Entity.Collection;
 import se.buaa.Entity.CollectionKey;
 import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
+import se.buaa.Entity.Document;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.ESDocument.ES_Expert;
+import se.buaa.Entity.ESDocument.ES_Keyword;
 import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Response.Result;
 import se.buaa.FontEntity.*;
 import se.buaa.Repository.CollectionRepository;
+import se.buaa.Repository.DocumentRepository;
 import se.buaa.Service.ES_DocumentService;
 
 //import java.net.http.HttpRequest;
@@ -60,6 +63,8 @@ public class AcademicController {
 
     @Autowired
     CollectionRepository collectionRepository;
+    @Autowired
+    DocumentRepository documentRepository;
 
     public static List<String> typeListDefault = new ArrayList<>();
 
@@ -284,18 +289,19 @@ public class AcademicController {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( searchWords1 ,
-                    "title"//"*" + keywords + "*",
-                    );
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",searchWords1).slop(0);
+
+//            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*"+searchWords1+ "*" ,
+//                    "title","keyword.keyword"//"*" + keywords + "*",
+//                    );
             boolQueryBuilder.must(queryBuilder);
         }
         if(title != null&& !title.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + title + "*","title");
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",title).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(keywords != null&& !keywords.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + keywords + "*","title");//es still has some problems,so we can't search keywords now!
-            boolQueryBuilder.must(queryBuilder);
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("keyword",keywords).slop(0);            boolQueryBuilder.must(queryBuilder);
         }
         if(startYear != null && endYear != null){
             QueryBuilder queryBuilder = QueryBuilders.rangeQuery("time").from(startYear).to(endYear)
@@ -303,14 +309,14 @@ public class AcademicController {
             boolQueryBuilder.must(queryBuilder);
         }
         if(experts != null&& !experts.equals("")){
-            QueryBuilder queryBuilder;
+
             experts  = experts.replaceAll("[,，\\s;.。]+","*");
-            System.out.println(experts);
-            queryBuilder = QueryBuilders.wildcardQuery( "experts","*" + experts + "*");
+
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("experts",experts).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(origin != null&& !origin.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + origin + "*","origin");
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("origin",origin).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(typeList.size() == 1){
@@ -330,7 +336,7 @@ public class AcademicController {
         if((keywords==null||keywords=="")&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
             List<String> expertList=new ArrayList<>();
             expertList.add(experts);
-            PageRequest page = PageRequest.of(1, 6);
+            PageRequest page = PageRequest.of(0, 6);
             Page<ES_Expert> es_experts = es_expertDao.findByNameIn(page,experts);
             List<ES_Expert> es_expertList = es_experts.toList();
             data.setExpert_list(es_expertList);
@@ -865,5 +871,60 @@ public class AcademicController {
             return Result.Success(true);
         }
 
+    }
+    @GetMapping("getHotKeywords")
+    public Result<ES_Keyword> getHotKeywords(){
+
+
+        Sort sort1 = getSort("1");
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withPageable(PageRequest.of(0, pageSize,sort1))
+                .build();
+
+        Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
+        List<ES_Document> es_documentList = es_documents.toList();
+        Map<String,Integer> map=new HashMap<>();
+        for(int i=0;i<10;i++){
+            int l=es_documentList.get(i).getKeywordList().size();
+            List<String> keywordList=es_documentList.get(i).getKeywordList();
+            for(int j=0;j<l;j++){
+                if(map.containsKey(keywordList.get(j))){
+                    int v=map.get(keywordList.get(j));
+                    map.put(keywordList.get(j),v+1);
+                }
+                else {
+                    map.put(keywordList.get(j),1);
+                }
+            }
+        }
+        List<Integer> list=getMax10Value(map);
+        List<ES_Keyword> row=new ArrayList<>();
+        for(int i=0;i<10;i++){
+            ES_Keyword es_keyword=new ES_Keyword();
+            es_keyword.view=list.get(i);
+            for(Map.Entry<String, Integer> entry : map.entrySet()){
+                String mapKey = entry.getKey();
+                Integer mapValue = entry.getValue();
+                if(mapValue==es_keyword.view){
+                    es_keyword.keyword=mapKey;
+                    row.add(es_keyword);
+                }
+            }
+
+        }
+        return new Result("200", CodeEnum.success.toString(),row);
+    }
+    public static List<Integer> getMax10Value(Map<String, Integer> map) {
+        if (map == null)
+            return null;
+        int length =map.size();
+        java.util.Collection<Integer> c = map.values();
+        Object[] obj = c.toArray();
+        Arrays.sort(obj);
+        List<Integer> list=new ArrayList<>();
+        for(int i=1;i<=10;i++){
+            list.add((Integer) obj[length-i]);
+        }
+        return list;
     }
 }
