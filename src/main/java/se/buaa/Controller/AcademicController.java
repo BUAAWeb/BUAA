@@ -34,6 +34,7 @@ import se.buaa.Entity.Data.SearchResultData;
 import se.buaa.Entity.Document;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.ESDocument.ES_Expert;
+import se.buaa.Entity.ESDocument.ES_Keyword;
 import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Response.Result;
 import se.buaa.FontEntity.*;
@@ -873,5 +874,52 @@ public class AcademicController {
             return Result.Success(true);
         }
 
+    }
+    @GetMapping("getHotKeywords")
+    public Result<ES_Keyword> getHotKeywords(){
+        List<ES_Document> es_documentList=es_documentDao.findTop10ByViews();
+        Map<String,Integer> map=new HashMap<>();
+        for(int i=0;i<10;i++){
+            int l=es_documentList.get(i).getKeywordList().size();
+            List<String> keywordList=es_documentList.get(i).getKeywordList();
+            for(int j=0;j<l;j++){
+                if(map.containsKey(keywordList.get(j))){
+                    int v=map.get(keywordList.get(j));
+                    map.put(keywordList.get(j),v+1);
+                }
+                else {
+                    map.put(keywordList.get(j),1);
+                }
+            }
+        }
+        List<Integer> list=getMax10Value(map);
+        List<ES_Keyword> row=new ArrayList<>();
+        for(int i=0;i<10;i++){
+            ES_Keyword es_keyword=new ES_Keyword();
+            es_keyword.view=list.get(i);
+            for(Map.Entry<String, Integer> entry : map.entrySet()){
+                String mapKey = entry.getKey();
+                Integer mapValue = entry.getValue();
+                if(mapValue==es_keyword.view){
+                    es_keyword.keyword=mapKey;
+                    row.add(es_keyword);
+                }
+            }
+
+        }
+        return new Result("200", CodeEnum.success.toString(), row);
+    }
+    public static List<Integer> getMax10Value(Map<String, Integer> map) {
+        if (map == null)
+            return null;
+        int length =map.size();
+        java.util.Collection<Integer> c = map.values();
+        Object[] obj = c.toArray();
+        Arrays.sort(obj);
+        List<Integer> list=new ArrayList<>();
+        for(int i=1;i<=10;i++){
+            list.add((Integer) obj[length-i]);
+        }
+        return list;
     }
 }

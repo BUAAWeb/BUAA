@@ -52,6 +52,18 @@ public class ES_Document {
     private String time;
     private boolean is_favor=false;
 
+    public void setAuthors(List<ES_Expert> authors) {
+        this.authors = authors;
+    }
+
+    public List<String> getKeywordList() {
+        return keywordList;
+    }
+
+    public void setKeywordList(List<String> keywordList) {
+        this.keywordList = keywordList;
+    }
+
     public String getDtype() {
         return dtype;
     }
