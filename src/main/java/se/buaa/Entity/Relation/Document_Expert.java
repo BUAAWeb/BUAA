@@ -12,6 +12,8 @@ public class Document_Expert {
     private String expertID;
     @Column(name = "documentID")
     private String documentID;
+    @Column(name = "expertName")
+    private String expertName;
 
     public String getExpertID() {
         return expertID;

@@ -40,10 +40,12 @@ import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Response.Result;
 import se.buaa.FontEntity.*;
 import se.buaa.Repository.CollectionRepository;
+import se.buaa.Repository.Docu_ExpertRepository;
 import se.buaa.Repository.DocumentRepository;
 import se.buaa.Service.ES_DocumentService;
 
 //import java.net.http.HttpRequest;
+import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -64,6 +66,9 @@ public class AcademicController {
     ES_ExpertDao es_expertDao;
 
     @Autowired
+    Docu_ExpertRepository docu_expertRepository;
+
+    @Autowired
     CollectionRepository collectionRepository;
     @Autowired
     DocumentRepository documentRepository;
@@ -72,130 +77,46 @@ public class AcademicController {
 
     static int pageSize = 10;
 
-    @RequestMapping("test")
-    public void test(String keywords,String experts,String type,String sort,int page){
-        Map<String,String> searchMap = new HashMap<>();
-        searchMap.put("keywords",keywords);
-        searchMap.put("experts",experts);
-        searchMap.put("startYear","0");
-        searchMap.put("endYear","2020");
-        searchMap.put("sort",sort);
-        List<String> typeList = getTypeList(type);
-
-        Data data = getSearchResult(searchMap, typeList,page);
-
-        System.out.println(data.total);
-        for(ES_Document es_document : data.getResult_list()){
-            System.out.println(es_document.getDtype());
-        }
-//        String field = "experts";
-//        String keyword = "*张伟*";
-//        String time = "time";
-////        BoolQueryBuilder boolQueryBuilder1 = new BoolQueryBuilder().should(QueryBuilders);
-//        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-//        boolQueryBuilder.must(QueryBuilders.wildcardQuery(field, keyword));
-//        QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("*计算机*",
-//                "title","summary");
-//        boolQueryBuilder.must(queryBuilder);
-//        QueryBuilder queryBuilder1 = QueryBuilders.rangeQuery("time").from("2000").to("2020")
-//                .includeUpper(true).includeLower(true);
-//        boolQueryBuilder.must(queryBuilder);
-//        boolQueryBuilder.must(queryBuilder1);
-//        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-//                .withQuery(boolQueryBuilder)
-//                .withPageable(PageRequest.of(0, 100))
-//                .build();
-////        long total  = es_documentDao.count();
-//        Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
-//        System.out.println("total:" + es_documents.getTotalElements());
-//        List<ES_Document> es_documentList = es_documents.toList();
-//        for(ES_Document es_document : es_documentList)
-//            System.out.println(es_document.getExperts() + "  title:" + es_document.getTitle() + "  summary:" + es_document.getSummary());
-////        PageRequest page = PageRequest.of(0, 200);
-////        String experts1 = "张伟";
-////        String experts2 = ",张伟,";
-////        String experts3 = "*张伟*";
-////
-////        for (int i = 0 ;i<5;i++){
-////            System.out.println(i + " :   experts:" + experts1);
-////            test1(i+1,experts1);
-////            System.out.println(i + " :   experts:" + experts2);
-////            test1(i+1,experts2);
-////            System.out.println(i + " :   experts:" + experts3);
-////            test1(i+1,experts3);
-////        }
-//
-//
-//
-//
-////        WildcardQueryBuilder wildcardQueryBuilder = new WildcardQueryBuilder()
-////        long total = es_documentDao.count();
-////        System.out.println("total: " + total);
-////        for(int i = 0;i <= 1000 ;i++){
-////            PageRequest page = PageRequest.of(i, 100);
-////            Iterable<ES_Document> highCitedList = es_documentDao.findAll(page);
-////            System.out.println("page:" + i + 1);
-////            for(ES_Document es_document : highCitedList) {
-////                System.out.println(es_document.toString());
-//////                es_document.setViews(0);
-////                es_documentDao.save(es_document);
-////            }
-////        }
-////        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("title", "小米");
-////        // 执行查询
-////        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-////        nativeSearchQueryBuilder.withQuery(queryBuilder);
-////        nativeSearchQueryBuilder.withSearchType(SearchType.QUERY_THEN_FETCH);
-////
-////        TermsAggregationBuilder tb =  AggregationBuilders.terms("citedQuantity").field("cited_quantity");
-////        nativeSearchQueryBuilder.addAggregation(tb);
-////        NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
-////
-////        Page<ES_Document> items = es_documentDao.search(nativeSearchQuery);
-////
-//////        Aggregations agg = elasticsearchOperations(nativeSearchQuery, searchResponse -> {
-//////            Aggregations aggregations = searchResponse.getAggregations();
-//////            return aggregations;
-//////        });
-////
-////        //这里是Storm流的写法，jdk8的新特性
-////        items.forEach(System.out::println);
-////        return items;
+    public ES_ExpertDao getEs_expertDao(){
+        return academicController.es_expertDao;
     }
 
+    public Docu_ExpertRepository getDocu_expertRepository(){
+        return academicController.docu_expertRepository;
+    }
 
-//    @RequestMapping("test")
-//    public void test(){
-//        long total = es_documentDao.count();
-//        for(int i = 0;i <= (total+1)/2000 ;i++){
-//            PageRequest page = PageRequest.of(i, 2000);
-//            Iterable<ES_Document> highCitedList = es_documentDao.findAll(page);
-//            for(ES_Document es_document : highCitedList) {
-//                es_document.setViews(0);
-//                es_documentDao.save(es_document);
-//            }
-//        }
-////        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("title", "小米");
-////        // 执行查询
-////        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-////        nativeSearchQueryBuilder.withQuery(queryBuilder);
-////        nativeSearchQueryBuilder.withSearchType(SearchType.QUERY_THEN_FETCH);
-////
-////        TermsAggregationBuilder tb =  AggregationBuilders.terms("citedQuantity").field("cited_quantity");
-////        nativeSearchQueryBuilder.addAggregation(tb);
-////        NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
-////
-////        Page<ES_Document> items = es_documentDao.search(nativeSearchQuery);
-////
-//////        Aggregations agg = elasticsearchOperations(nativeSearchQuery, searchResponse -> {
-//////            Aggregations aggregations = searchResponse.getAggregations();
-//////            return aggregations;
-//////        });
-////
-////        //这里是Storm流的写法，jdk8的新特性
-////        items.forEach(System.out::println);
-////        return items;
-//    }
+    public static AcademicController academicController;
+    @PostConstruct //通过@PostConstruct实现初始化bean之前进行的操作
+    public void init() {
+        academicController = this;
+        academicController.docu_expertRepository = this.docu_expertRepository;
+        academicController.es_documentDao = this.es_documentDao;
+        //初使化时将已静态化的academicController实例化
+    }
+
+    @RequestMapping("test1")
+    public List<ES_Document> test1(){
+        Page<ES_Document> es_documents = es_documentDao.findAll(PageRequest.of(0,10));
+        return es_documents.toList();
+    }
+
+    @RequestMapping("test")
+    public void test(String keywords,String experts,String type,String sort,int page) {
+        Map<String, String> searchMap = new HashMap<>();
+        searchMap.put("keywords", keywords);
+        searchMap.put("experts", experts);
+        searchMap.put("startYear", "0");
+        searchMap.put("endYear", "2020");
+        searchMap.put("sort", sort);
+        List<String> typeList = getTypeList(type);
+
+        Data data = getSearchResult(searchMap, typeList, page);
+
+        System.out.println(data.total);
+        for (ES_Document es_document : data.getResult_list()) {
+            System.out.println(es_document.getDtype());
+        }
+    }
 
     @RequestMapping("getHighCited")
     public Result<Data> getHighCited() {
@@ -208,27 +129,6 @@ public class AcademicController {
         Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
         List<ES_Document> documentsList = new ArrayList<>();
         highCitedList.forEach(single ->{documentsList.add(single);});
-//        for(ES_Document es_document : highCitedList){
-//            System.out.println(es_document.getAuthors());
-//        }
-//        for(ES_Document es_document : documentsList){
-//            String experts = es_document.getExperts();
-//            String[] authorNames = experts.split(",");
-//            List<ES_Expert> es_experts = new ArrayList<>();
-//            for(String name : authorNames){
-//                ES_Expert expert = new ES_Expert();
-//                List<ES_Expert> temp =  es_expertDao.findByName(name);
-//                if(temp == null || temp.size() == 0) {
-//                    expert.setName(name);
-//                }
-//                else
-//                    expert = temp.get(0);
-//                es_experts.add(expert);
-//
-//            }
-////        System.out.print("1");
-//            es_document.setAuthors(es_experts);
-//        }
         Data data = new Data();
         data.setResult_list(documentsList);
         return new Result("200", CodeEnum.success.toString(), data);
@@ -237,35 +137,27 @@ public class AcademicController {
 
     @RequestMapping("getExpert")
     public Result<Data> getExpert(String expertName,int pageNumber) {
-        Date date1=new Date();
+        Date date1 = new Date();
         Sort.Order order = Sort.Order.desc("time");
         System.out.println(expertName);
         List<Sort.Order> orderList = new ArrayList<>();
-//        orderList.add(order1);
         orderList.add(order);
         Sort sort = Sort.by(orderList);
 
-        if(expertName==null)
-            return new Result("308", CodeEnum.error.toString());
+        if(expertName == null)
+            return new Result<>("308", CodeEnum.error.toString());
         List<String> expertsName=new ArrayList<>();
-//        expertsName.add("，"+expertName+"，");
-//        expertsName.add(","+expertName+",");
-//        expertsName.add(expertName+"，");
-//        expertsName.add(expertName+",");
-//        expertsName.add("，"+expertName);
-//        expertsName.add(","+expertName);
+
         expertsName.add(expertName);
 
-//        Iterable<ES_Document> highCitedList = es_documentDao.findByExpertsLikeAndExperts(page,expertsName,expertName);
-//        List<ES_Document> documentsList = es_documentDao.findByAuthors(page,expertName);
         List<ES_Document> documentsList = new ArrayList<>();
         List<ES_Document> es_documentList = new ArrayList<>();
-        es_documentList=es_documentDao.findByExpertsIn(expertsName);
+        es_documentList = es_documentDao.findByExpertsIn(expertsName);
 
         Data data = new Data();
         data.total=es_documentList.size();
         if(data.total<10*pageNumber-10)
-            return new Result("300", CodeEnum.pageOutOfRange.toString(), data);
+            return new Result<>("300", CodeEnum.pageOutOfRange.toString(), data);
         if(data.total<10*pageNumber-1)
             data.setResult_list(documentsList.subList(10*pageNumber-10,data.total));
         else
@@ -274,7 +166,7 @@ public class AcademicController {
 
         Date date2=new Date();
         data.time= (int) (date2.getTime( )-date1.getTime());
-        return new Result("200", CodeEnum.success.toString(), data);
+        return new Result<>("200", CodeEnum.success.toString(), data);
 
     }
 

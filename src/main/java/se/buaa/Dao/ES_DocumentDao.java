@@ -62,10 +62,21 @@ public interface  ES_DocumentDao extends ElasticsearchRepository<ES_Document, Lo
     List<ES_Document> findByTitleLike(String title);
     List<ES_Document> findTop10ByViews();
     Page<ES_Document> findAll(Pageable page);
-    List<ES_Document> findByKeywordsIn(String keywords);
     Page<ES_Document> findByExpertsIn(Pageable page,List<String> experts);
     Page<ES_Document> findByKeywordsIn(Pageable page,String keywords);
     List<ES_Document> findByExpertsIn(List<String> experts);
+    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLike(Pageable page,String keywords,String experts,String origin);
+
+    Page<ES_Document> findByExpertsLike(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsIn(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsContaining(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsContains(Pageable page,String keywords);
+//    Page<ES_Document> (Pageable page,String keywords);
+    Page<ES_Document> findByKeywordsIsIn(Pageable page,String keywords);
+    Page<ES_Document> findByExpertsIsIn(Pageable page,String experts);
+
+    Page<ES_Document> findByKeywordsLikeAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page,
+                                                                                  String keywords,String experts,String origin,String startTime,String endTime);
     Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLike(Pageable page,String keywords,String experts,String origin);
     Page<ES_Document> findByKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetween(Pageable page, String keywords,String experts,String origin,String startTime,String endTime);
     Page<ES_Document> findByTitleInOrSummaryInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtype(

@@ -3,7 +3,7 @@ package se.buaa.Entity.Enumeration;
 public enum CodeEnum {
     success,error,sortNotFound,pageNotInteger,pageLessThanOne,
     pageOutOfRange,documentNotExist,docIdNotExist,noSort,noPage,
-    noUser,yearNotInteger,noResult;
+    noUser,yearNotInteger,noResult,noExpert;
 
     public String getCode(){
         switch (this){
@@ -33,6 +33,8 @@ public enum CodeEnum {
                 return "310";
             case yearNotInteger:
                 return "311";
+            case noExpert:
+                return "312";
             default:
                 return "404";
         }
@@ -64,6 +66,8 @@ public enum CodeEnum {
                 return "No User ID";
             case yearNotInteger:
                 return "Year is not a number";
+            case noExpert:
+                return "No expert";
             case error:
                 return "error";
             default:
