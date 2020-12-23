@@ -77,7 +77,7 @@ public class JwtUtils {
     public static Map<String, Object> parseToken(String token) {
         return Jwts.parser()  // 得到DefaultJwtParser
                 .setSigningKey(generateKey()) // 设置签名密钥
-                .parseClaimsJws(token)
+                .parseClaimsJwt(token)
                 .getBody();
     }
 

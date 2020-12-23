@@ -13,18 +13,6 @@ package se.buaa.Controller;
 //415 （unsupported media type）- 接受到的表示不受支持
 //500 （internal server error）- 通用错误响应
 //503 （Service Unavailable）- 服务当前无法处理请求
-import org.apache.commons.collections.IteratorUtils;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregator;
-import org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
-import org.hibernate.criterion.Order;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -43,19 +31,20 @@ import se.buaa.Entity.Collection;
 import se.buaa.Entity.CollectionKey;
 import se.buaa.Entity.Data.Data;
 import se.buaa.Entity.Data.SearchResultData;
+import se.buaa.Entity.Document;
 import se.buaa.Entity.ESDocument.ES_Document;
 import se.buaa.Entity.ESDocument.ES_Expert;
+import se.buaa.Entity.ESDocument.ES_Keyword;
 import se.buaa.Entity.Enumeration.CodeEnum;
 import se.buaa.Entity.Response.Result;
 import se.buaa.FontEntity.*;
 import se.buaa.Repository.CollectionRepository;
+import se.buaa.Repository.DocumentRepository;
 import se.buaa.Service.ES_DocumentService;
 
 //import java.net.http.HttpRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 //@CrossOrigin
@@ -74,41 +63,12 @@ public class AcademicController {
 
     @Autowired
     CollectionRepository collectionRepository;
+    @Autowired
+    DocumentRepository documentRepository;
 
     public static List<String> typeListDefault = new ArrayList<>();
 
     static int pageSize = 10;
-
-    public void test1(int k,String experts){
-        PageRequest page = PageRequest.of(0, 200);
-        Page<ES_Document> es_documents  = null;
-        switch (k){
-            case 1:{
-                es_documents = es_documentDao.findByExpertsLike(page,experts);
-                break;
-            }
-            case 2:{
-                es_documents = es_documentDao.findByExpertsContaining(page,experts);
-                break;
-            }
-            case 3:{
-                es_documents = es_documentDao.findByExpertsContains(page,experts);
-                break;
-            }
-            case 4:{
-                es_documents = es_documentDao.findByExpertsIn(page,experts);
-                break;
-            }
-            case 5:{
-                es_documents = es_documentDao.findByExpertsIsIn(page,experts);
-                break;
-            }
-        }
-
-        List<ES_Document> es_documentList = es_documents.toList();
-        for(ES_Document es_document : es_documentList)
-            System.out.println(es_document.getExperts().toString());
-    }
 
     @RequestMapping("test")
     public void test(String keywords,String experts,String type,String sort,int page){
@@ -163,21 +123,77 @@ public class AcademicController {
 ////            test1(i+1,experts3);
 ////        }
 //
-//        TermsAggregationBuilder tb =  AggregationBuilders.terms("citedQuantity").field("cited_quantity");
-//        nativeSearchQueryBuilder.addAggregation(tb);
-//        NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
 //
-//        Page<ES_Document> items = es_documentDao.search(nativeSearchQuery);
 //
-////        Aggregations agg = elasticsearchOperations(nativeSearchQuery, searchResponse -> {
-////            Aggregations aggregations = searchResponse.getAggregations();
-////            return aggregations;
-////        });
 //
-//        //这里是Storm流的写法，jdk8的新特性
-//        items.forEach(System.out::println);
-//        return items;
+////        WildcardQueryBuilder wildcardQueryBuilder = new WildcardQueryBuilder()
+////        long total = es_documentDao.count();
+////        System.out.println("total: " + total);
+////        for(int i = 0;i <= 1000 ;i++){
+////            PageRequest page = PageRequest.of(i, 100);
+////            Iterable<ES_Document> highCitedList = es_documentDao.findAll(page);
+////            System.out.println("page:" + i + 1);
+////            for(ES_Document es_document : highCitedList) {
+////                System.out.println(es_document.toString());
+//////                es_document.setViews(0);
+////                es_documentDao.save(es_document);
+////            }
+////        }
+////        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("title", "小米");
+////        // 执行查询
+////        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+////        nativeSearchQueryBuilder.withQuery(queryBuilder);
+////        nativeSearchQueryBuilder.withSearchType(SearchType.QUERY_THEN_FETCH);
+////
+////        TermsAggregationBuilder tb =  AggregationBuilders.terms("citedQuantity").field("cited_quantity");
+////        nativeSearchQueryBuilder.addAggregation(tb);
+////        NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
+////
+////        Page<ES_Document> items = es_documentDao.search(nativeSearchQuery);
+////
+//////        Aggregations agg = elasticsearchOperations(nativeSearchQuery, searchResponse -> {
+//////            Aggregations aggregations = searchResponse.getAggregations();
+//////            return aggregations;
+//////        });
+////
+////        //这里是Storm流的写法，jdk8的新特性
+////        items.forEach(System.out::println);
+////        return items;
     }
+
+
+//    @RequestMapping("test")
+//    public void test(){
+//        long total = es_documentDao.count();
+//        for(int i = 0;i <= (total+1)/2000 ;i++){
+//            PageRequest page = PageRequest.of(i, 2000);
+//            Iterable<ES_Document> highCitedList = es_documentDao.findAll(page);
+//            for(ES_Document es_document : highCitedList) {
+//                es_document.setViews(0);
+//                es_documentDao.save(es_document);
+//            }
+//        }
+////        MatchQueryBuilder queryBuilder = QueryBuilders.matchQuery("title", "小米");
+////        // 执行查询
+////        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+////        nativeSearchQueryBuilder.withQuery(queryBuilder);
+////        nativeSearchQueryBuilder.withSearchType(SearchType.QUERY_THEN_FETCH);
+////
+////        TermsAggregationBuilder tb =  AggregationBuilders.terms("citedQuantity").field("cited_quantity");
+////        nativeSearchQueryBuilder.addAggregation(tb);
+////        NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
+////
+////        Page<ES_Document> items = es_documentDao.search(nativeSearchQuery);
+////
+//////        Aggregations agg = elasticsearchOperations(nativeSearchQuery, searchResponse -> {
+//////            Aggregations aggregations = searchResponse.getAggregations();
+//////            return aggregations;
+//////        });
+////
+////        //这里是Storm流的写法，jdk8的新特性
+////        items.forEach(System.out::println);
+////        return items;
+//    }
 
     @RequestMapping("getHighCited")
     public Result<Data> getHighCited() {
@@ -216,6 +232,7 @@ public class AcademicController {
         return new Result("200", CodeEnum.success.toString(), data);
 
     }
+
     @RequestMapping("getExpert")
     public Result<Data> getExpert(String expertName,int pageNumber) {
         Date date1=new Date();
@@ -272,18 +289,19 @@ public class AcademicController {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + searchWords1 + "*"  ,
-                    "title","keywords"//,"keywords.keyword"//"*" + keywords + "*",
-                    );
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",searchWords1).slop(0);
+
+//            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*"+searchWords1+ "*" ,
+//                    "title","keyword.keyword"//"*" + keywords + "*",
+//                    );
             boolQueryBuilder.must(queryBuilder);
         }
         if(title != null&& !title.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + title + "*","title");
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",title).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(keywords != null&& !keywords.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + keywords + "*","keywords");//es still has some problems,so we can't search keywords now!
-            boolQueryBuilder.must(queryBuilder);
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("keyword",keywords).slop(0);            boolQueryBuilder.must(queryBuilder);
         }
         if(startYear != null && endYear != null){
             QueryBuilder queryBuilder = QueryBuilders.rangeQuery("time").from(startYear).to(endYear)
@@ -291,14 +309,14 @@ public class AcademicController {
             boolQueryBuilder.must(queryBuilder);
         }
         if(experts != null&& !experts.equals("")){
-            QueryBuilder queryBuilder;
+
             experts  = experts.replaceAll("[,，\\s;.。]+","*");
-            System.out.println(experts);
-            queryBuilder = QueryBuilders.wildcardQuery( "experts","*" + experts + "*");
+
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("experts",experts).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(origin != null&& !origin.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*" + origin + "*","origin");
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("origin",origin).slop(0);
             boolQueryBuilder.must(queryBuilder);
         }
         if(typeList.size() == 1){
@@ -315,10 +333,10 @@ public class AcademicController {
         Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
         List<ES_Document> es_documentList = es_documents.toList();
         //如果只搜作者，添加返回作者列表
-        if((keywords==null|| keywords.equals(""))&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
+        if((keywords==null||keywords=="")&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
             List<String> expertList=new ArrayList<>();
             expertList.add(experts);
-            PageRequest page = PageRequest.of(1, 6);
+            PageRequest page = PageRequest.of(0, 6);
             Page<ES_Expert> es_experts = es_expertDao.findByNameIn(page,experts);
             List<ES_Expert> es_expertList = es_experts.toList();
             data.setExpert_list(es_expertList);
@@ -601,33 +619,32 @@ public class AcademicController {
             }
         }
 
-        data.filter_list.add(getTimeFilter(search_word,typeList));
-        data.filter_list.add(getTypeFilter(search_word,typeList));
-        return new Result<Data>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
-//        data.setTotal();
-//        if(sortWay.compareTo("cited")==0){
-//            return new Result<SearchResultData>("200","success");
-//        }
-//        else if(sortWay.compareTo("time")==0){
-//            return new Result<SearchResultData>("200","success");
-//        }
-//        else{
-//            Sort.Order order = Sort.Order.desc("cited_quantity");
-//            List<Sort.Order> orderList = new ArrayList<>();
-////        orderList.add(order1);
-//            orderList.add(order);
-//            Sort sort = Sort.by(orderList);
-//            PageRequest page = PageRequest.of(0, 10 ,sort);
-//            Iterable<ES_Document> highCitedList = es_documentService.findAll(page);
-//            List<ES_Document> documentsList = new ArrayList<>();
-//            highCitedList.forEach(single ->{documentsList.add(single);});
-//            SearchResultData data=new SearchResultData();
-//            data.documentList=documentsList;
-//            return new Result<SearchResultData>("200","success",data);
+//        Iterable<ES_Document> searchResult = es_documentDao.findByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                page1,search_word.getKw(),search_word.getExperts(),search_word.getOrigin(),search_word.getStartTime(),search_word.getEndTime(),typeList,
+//                search_word.getKw(),search_word.getExperts(),search_word.getOrigin(),search_word.getStartTime(),search_word.getEndTime(),typeList,
+//                search_word.getKw(),search_word.getExperts(),search_word.getOrigin(),search_word.getStartTime(),search_word.getEndTime(),typeList
+//        );
+
+//        List<ES_Document> documentsList = new ArrayList<>();
+//        searchResult.forEach(single ->{documentsList.add(single);});
+//
+//        for (ES_Document es_document : documentsList) {
+//            String doc_id = es_document.getId();
+//            CollectionKey ck = new CollectionKey(Integer.parseInt(userID), doc_id);
+//            Optional<Collection> res = collectionRepository.findById(ck);
+//            es_document.setIs_favor(res.isPresent());
 //        }
 //
 //        data.setResult_list(documentsList);
 //        data.setTotal(total);
+        data.filter_list.add(getTimeFilter(search_word,typeList));
+        data.filter_list.add(getTypeFilter(search_word,typeList));
+        Date date2=new Date();
+
+
+        data.time= (int) (date2.getTime()-date1.getTime());
+
+        return new Result<>(CodeEnum.success.getCode(),CodeEnum.success.toString(),data);
     }
     private Filter getTimeFilter(SearchWords searchWords,List<String> typeList){
         Filter filter=new Filter();
@@ -658,6 +675,56 @@ public class AcademicController {
                 filter.filter_itemList.add(filter_item);
         }
         return filter;
+//        int count1 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year1.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year1.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year1.toString(),searchWords.getEndTime(),typeList
+//        );
+//        int count2 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year2.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year2.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year2.toString(),searchWords.getEndTime(),typeList
+//        );
+//        int count3 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year3.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year3.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year3.toString(),searchWords.getEndTime(),typeList
+//        );
+//        int count4 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year4.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year4.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year4.toString(),searchWords.getEndTime(),typeList
+//        );
+//        int count5 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year5.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year5.toString(),searchWords.getEndTime(),typeList,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),year5.toString(),searchWords.getEndTime(),typeList
+//        );
+//        Filter_Item filter_item1=new Filter_Item();
+//        Filter_Item filter_item2=new Filter_Item();
+//        Filter_Item filter_item3=new Filter_Item();
+//        Filter_Item filter_item4=new Filter_Item();
+//        Filter_Item filter_item5=new Filter_Item();
+//        filter_item1.content=year1.toString();
+//        filter_item1.count=count1;
+//        filter_item2.content=year2.toString();
+//        filter_item2.count=count2;
+//        filter_item3.content=year3.toString();
+//        filter_item3.count=count3;
+//        filter_item4.content=year4.toString();
+//        filter_item4.count=count4;
+//        filter_item5.content=year5.toString();
+//        filter_item5.count=count5;
+//        if(start<=year1)
+//            filter.filter_itemList.add(filter_item1);
+//        if(start<=year2)
+//            filter.filter_itemList.add(filter_item2);
+//        if(start<=year3)
+//            filter.filter_itemList.add(filter_item3);
+//        if(start<=year4)
+//            filter.filter_itemList.add(filter_item4);
+//        if(start<=year5)
+//            filter.filter_itemList.add(filter_item5);
     }
     private Filter getTypeFilter(SearchWords searchWords,List<String> typeList){// TODO: 2020-12-18 filter还没有传并接受
         String[] type = {
@@ -687,9 +754,85 @@ public class AcademicController {
             filter.filter_itemList.add(filter_item);
         }
         return filter;
+
+//        List<String> typeList1=new ArrayList<>();
+//        typeList1.add("期刊");
+//        List<String> typeList2=new ArrayList<>();
+//        typeList2.add("会议");
+//        List<String> typeList3=new ArrayList<>();
+//        typeList3.add("专利");
+//        List<String> typeList4=new ArrayList<>();
+//        typeList4.add("图书");
+//        List<String> typeList5=new ArrayList<>();
+//        typeList5.add("学位");
+//
+//        int count1 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList1,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList1,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList1
+//        );
+//        int count2 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList2,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList2,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList2
+//        );
+//        int count3 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList3,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList3,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList3
+//        );
+//        int count4 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList4,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList4,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList4
+//        );
+//        int count5 = es_documentDao.countByTitleInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrSummaryInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeInOrKeywordsInAndExpertsLikeAndOriginLikeAndTimeBetweenAndDtypeIn(
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList5,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList5,
+//                searchWords.getKw(),searchWords.getExperts(),searchWords.getOrigin(),searchWords.getStartTime(),searchWords.getEndTime(),typeList5
+//        );
+//        Filter_Item filter_item1=new Filter_Item();
+//        Filter_Item filter_item2=new Filter_Item();
+//        Filter_Item filter_item3=new Filter_Item();
+//        Filter_Item filter_item4=new Filter_Item();
+//        Filter_Item filter_item5=new Filter_Item();
+//        filter_item1.content="期刊";
+//        filter_item1.count=count1;
+//        filter_item2.content="会议";
+//        filter_item2.count=count2;
+//        filter_item3.content="专利";
+//        filter_item3.count=count3;
+//        filter_item4.content="图书";
+//        filter_item4.count=count4;
+//        filter_item5.content="学位";
+//        filter_item5.count=count5;
+//        if(typeList.size()==5){
+//            filter.filter_itemList.add(filter_item1);
+//            filter.filter_itemList.add(filter_item2);
+//            filter.filter_itemList.add(filter_item3);
+//            filter.filter_itemList.add(filter_item4);
+//            filter.filter_itemList.add(filter_item5);
+//        }
+//        else if(typeList.get(0).compareTo("期刊")==0){
+//            filter.filter_itemList.add(filter_item1);
+//        }
+//        else if(typeList.get(0).compareTo("会议")==0){
+//            filter.filter_itemList.add(filter_item2);
+//        }
+//        else if(typeList.get(0).compareTo("专利")==0){
+//            filter.filter_itemList.add(filter_item3);
+//        }
+//        else if(typeList.get(0).compareTo("图书")==0){
+//            filter.filter_itemList.add(filter_item4);
+//        }
+//        else if(typeList.get(0).compareTo("学位")==0){
+//            filter.filter_itemList.add(filter_item5);
+//        }
     }
     @RequestMapping("getById")
     public Result<ES_Document> getById(String document_id,int user_id){
+//        if(user_id == null)
+//            return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
         if(document_id == null)
             return new Result<>(CodeEnum.docIdNotExist.getCode(), CodeEnum.docIdNotExist.toString(),null);
         ES_Document es_document = es_documentDao.findByDocumentid(document_id);
@@ -728,5 +871,60 @@ public class AcademicController {
             return Result.Success(true);
         }
 
+    }
+    @GetMapping("getHotKeywords")
+    public Result<ES_Keyword> getHotKeywords(){
+
+
+        Sort sort1 = getSort("1");
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withPageable(PageRequest.of(0, pageSize,sort1))
+                .build();
+
+        Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
+        List<ES_Document> es_documentList = es_documents.toList();
+        Map<String,Integer> map=new HashMap<>();
+        for(int i=0;i<10;i++){
+            int l=es_documentList.get(i).getKeywordList().size();
+            List<String> keywordList=es_documentList.get(i).getKeywordList();
+            for(int j=0;j<l;j++){
+                if(map.containsKey(keywordList.get(j))){
+                    int v=map.get(keywordList.get(j));
+                    map.put(keywordList.get(j),v+1);
+                }
+                else {
+                    map.put(keywordList.get(j),1);
+                }
+            }
+        }
+        List<Integer> list=getMax10Value(map);
+        List<ES_Keyword> row=new ArrayList<>();
+        for(int i=0;i<10;i++){
+            ES_Keyword es_keyword=new ES_Keyword();
+            es_keyword.view=list.get(i);
+            for(Map.Entry<String, Integer> entry : map.entrySet()){
+                String mapKey = entry.getKey();
+                Integer mapValue = entry.getValue();
+                if(mapValue==es_keyword.view){
+                    es_keyword.keyword=mapKey;
+                    row.add(es_keyword);
+                }
+            }
+
+        }
+        return new Result("200", CodeEnum.success.toString(),row);
+    }
+    public static List<Integer> getMax10Value(Map<String, Integer> map) {
+        if (map == null)
+            return null;
+        int length =map.size();
+        java.util.Collection<Integer> c = map.values();
+        Object[] obj = c.toArray();
+        Arrays.sort(obj);
+        List<Integer> list=new ArrayList<>();
+        for(int i=1;i<=10;i++){
+            list.add((Integer) obj[length-i]);
+        }
+        return list;
     }
 }

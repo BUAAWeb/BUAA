@@ -21,19 +21,18 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Data
-@Document(indexName = "document",indexStoreType = "doc")
+@Document(indexName = "document3",indexStoreType = "doc")
 public class ES_Document {
     @Id
     private String id;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String documentid;
-    @Field(index = false, type = FieldType.Keyword)
+    @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String title;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
     private String dtype;
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-//    @Field(analyzer = "ik_smart",type = FieldType.Keyword)
     @Field(index = true, type = FieldType.Keyword)
     private String experts;
     @Field(analyzer = "ik_smart", type = FieldType.Text)
@@ -52,6 +51,18 @@ public class ES_Document {
 //    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     private String time;
     private boolean is_favor=false;
+
+    public void setAuthors(List<ES_Expert> authors) {
+        this.authors = authors;
+    }
+
+    public List<String> getKeywordList() {
+        return keywordList;
+    }
+
+    public void setKeywordList(List<String> keywordList) {
+        this.keywordList = keywordList;
+    }
 
     public String getDtype() {
         return dtype;
@@ -109,7 +120,9 @@ public class ES_Document {
         this.views = views;
     }
 
-
+    public void setEs_expertDao(ES_ExpertDao es_expertDao) {
+        this.es_expertDao = es_expertDao;
+    }
 
     public String getId() {
         return id;
@@ -163,10 +176,20 @@ public class ES_Document {
         return views;
     }
 
+    public ES_ExpertDao getEs_expertDao() {
+        return es_expertDao;
+    }
     @Transient
     private List<ES_Expert> authors = new ArrayList<>();
     @Transient
     private List<String> keywordList = new ArrayList<>();
+
+//    @Transient
+//    private int views ;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @Autowired
+    ES_ExpertDao es_expertDao;
 
     @PersistenceConstructor
     public ES_Document(String dtype,String id, String title, String experts, String keywords, String summary,
