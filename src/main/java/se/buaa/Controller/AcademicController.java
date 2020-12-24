@@ -101,22 +101,18 @@ public class AcademicController {
         return es_documents.toList();
     }
 
-    @RequestMapping("test")
-    public void test(String keywords,String experts,String type,String sort,int page) {
-        Map<String, String> searchMap = new HashMap<>();
-        searchMap.put("keywords", keywords);
-        searchMap.put("experts", experts);
-        searchMap.put("startYear", "0");
-        searchMap.put("endYear", "2020");
-        searchMap.put("sort", sort);
-        List<String> typeList = getTypeList(type);
-
-        Data data = getSearchResult(searchMap, typeList, page);
-
-        System.out.println(data.total);
-        for (ES_Document es_document : data.getResult_list()) {
-            System.out.println(es_document.getDtype());
-        }
+    @RequestMapping("test/jpafindAll")
+    public List<Document> testjpafindAll() {
+        Sort.Order order = Sort.Order.desc("time");
+        List<Sort.Order> orderList = new ArrayList<>();
+//        orderList.add(order1);
+        orderList.add(order);
+        Sort sort = Sort.by(orderList);
+        PageRequest page = PageRequest.of(0, 20,sort);
+        Iterable<Document> highCitedList = documentRepository.findAll(page);
+        List<Document> documentsList = new ArrayList<>();
+        highCitedList.forEach(single ->{documentsList.add(single);});
+        return documentsList;
     }
 
     @RequestMapping("getHighCited")
