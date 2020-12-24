@@ -184,7 +184,7 @@ public class AcademicController {
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 //        System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-                QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",title).slop(0);
+                QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",searchWords1).slop(0);
                 boolQueryBuilder.must(queryBuilder);
 //                MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(searchWords1,"title","experts","keywords");
 ////            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*"+searchWords1+ "*" ,

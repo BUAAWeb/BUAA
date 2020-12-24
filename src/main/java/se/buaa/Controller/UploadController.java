@@ -34,10 +34,10 @@ public class UploadController {
     }
     @RequestMapping("/getImg")
     @ResponseBody
-    public Result getImg(@RequestParam int imgID) {
+    public getImgRes getImg(@RequestParam int imgID) {
         getImgRes data = new getImgRes();
         data.img = blobRepository.findBlob2ByImgID(imgID).data;
-        return Result.Success(data);
+        return data;
     }
 
     public class getImgRes{
