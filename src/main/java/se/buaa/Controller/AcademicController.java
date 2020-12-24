@@ -175,7 +175,7 @@ public class AcademicController {
         Data data = new Data();
         String searchWords1 = searchWords.getSearchWords();
         String title = searchWords.getTitle();
-        String keywords = searchWords.getKeywords();
+        String keywords = searchWords.getKeyWords();
         String startYear = searchWords.getStartTime();
         String endYear = searchWords.getEndTime();
         String experts = searchWords.getExperts();

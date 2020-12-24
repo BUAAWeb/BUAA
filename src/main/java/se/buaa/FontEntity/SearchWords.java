@@ -6,7 +6,7 @@ import lombok.Data;
 public class SearchWords {
     String searchWords;
     String title;
-    String keywords;
+    String keyWords;
     String experts;
     String origin;
     String startTime;
@@ -28,12 +28,12 @@ public class SearchWords {
         this.title = title;
     }
 
-    public String getKeywords() {
-        return keywords;
+    public String getKeyWords() {
+        return keyWords;
     }
 
-    public void setKeywords(String keywords) {
-        this.keywords = keywords;
+    public void setKeyWords(String keyWords) {
+        this.keyWords = keyWords;
     }
 //    public SearchWords copy()
 
