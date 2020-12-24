@@ -787,7 +787,7 @@ public class AcademicController {
     public Result<ES_Keyword> getHotKeywords(){
 
 
-        Sort sort1 = getSort("view");
+        Sort sort1 = getSort("citedNum");
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withPageable(PageRequest.of(0, pageSize,sort1))
                 .build();

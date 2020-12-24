@@ -32,7 +32,7 @@ public class KeywordController {
     public void setKeyword(){
 //        if(user_id == null)
 //            return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
-        int i=164;
+        int i=1000;
         while(true){
             NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                     .withPageable(PageRequest.of(i, 100))
