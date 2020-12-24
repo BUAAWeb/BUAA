@@ -1,5 +1,8 @@
 package se.buaa.Controller;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,34 +35,31 @@ public class KeywordController {
     public void setKeyword(){
 //        if(user_id == null)
 //            return new Result<>(CodeEnum.noUser.getCode(), CodeEnum.noUser.toString(),null);
-        int i=1300;
+
+
+        int i=0;
         while(true){
             NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                     .withPageable(PageRequest.of(i, 100))
                     .build();
             i++;
-            Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
-            List<ES_Document> es_documentList = es_documents.toList();
-            if(es_documentList.size()==0)
+            Page<ES_Keyword> es_keyword = es_keywordDao.search(searchQuery);
+            List<ES_Keyword> ES_keywordList = es_keyword.toList();
+            if(ES_keywordList.size()==0)
                 break;
-            for(ES_Document es_document:es_documentList){
-                for(String keyword:es_document.getKeywordList()){
-                    if(Pattern.matches("\\s*",keyword)||keyword==null){
-                        continue;
-                    }
-                    ES_Keyword es_keyword = es_keywordDao.findByKeyword(keyword);
-                    if(es_keyword!=null){
-                        System.out.println(es_keyword.keyword+"已存在:"+i);
-                        es_keyword.citedNum++;
-                        es_keywordDao.save(es_keyword);
-                        continue;
-                    }
-                    else {
-                        es_keyword=new ES_Keyword();
-                        es_keyword.keyword=keyword;
-                        System.out.println(keyword);
-                        es_keywordDao.save(es_keyword);
-                    }
+            for(ES_Keyword es_keyword1:ES_keywordList){
+                String keywords=es_keyword1.keyword;
+                if(keywords != null&& !keywords.equals("")){
+                    BoolQueryBuilder boolQueryBuilder=new BoolQueryBuilder();
+                    QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("keywords",keywords).slop(0);
+                    boolQueryBuilder.must(queryBuilder);
+                    NativeSearchQuery searchQuery1 = new NativeSearchQueryBuilder()
+                            .withPageable(PageRequest.of(0, 100))
+                            .withQuery(queryBuilder)
+                            .build();
+                    es_keyword1.citedNum = (int) es_documentDao.search(searchQuery1).getTotalElements();
+                    System.out.println(es_keyword1.keyword+":"+es_keyword1.citedNum);
+                    es_keywordDao.save(es_keyword1);
                 }
             }
         }

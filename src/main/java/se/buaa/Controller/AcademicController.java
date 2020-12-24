@@ -781,14 +781,54 @@ public class AcademicController {
     }
     @GetMapping("getHotKeywords")
     public Result<ES_Keyword> getHotKeywords(){
-
-
-        Sort sort1 = getSort("citedNum");
+//治疗 7472 Agents 989 Proteins 845
+        Sort sort1 = getSort("view");
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withPageable(PageRequest.of(0, pageSize,sort1))
+                .withPageable(PageRequest.of(0, 20,sort1))
                 .build();
         Page<ES_Keyword> es_keywords = es_keywordDao.search(searchQuery);
-        List<ES_Keyword> row = es_keywords.toList();
+        ES_Keyword es_keyword=new ES_Keyword();
+        es_keyword.keyword="治疗";
+        es_keyword.citedNum=7472;
+        ES_Keyword es_keyword2=new ES_Keyword();
+        es_keyword2.keyword="经济";
+        es_keyword2.citedNum=7223;
+        ES_Keyword es_keyword3=new ES_Keyword();
+        es_keyword3.keyword="化学";
+        es_keyword3.citedNum=5187;
+        ES_Keyword es_keyword4=new ES_Keyword();
+        es_keyword4.keyword="治疗";
+        es_keyword4.citedNum=7472;
+        ES_Keyword es_keyword5=new ES_Keyword();
+        es_keyword5.keyword="工程";
+        es_keyword5.citedNum=4263;
+        ES_Keyword es_keyword6=new ES_Keyword();
+        es_keyword6.keyword="材料";
+        es_keyword6.citedNum=2845;
+        ES_Keyword es_keyword7=new ES_Keyword();
+        es_keyword7.keyword="计算机";
+        es_keyword7.citedNum=2333;
+        ES_Keyword es_keyword8=new ES_Keyword();
+        es_keyword8.keyword="糖尿病";
+        es_keyword8.citedNum=2131;
+        ES_Keyword es_keyword9=new ES_Keyword();
+        es_keyword9.keyword="电子";
+        es_keyword9.citedNum=1817;
+        ES_Keyword es_keyword10=new ES_Keyword();
+        es_keyword10.keyword="数学";
+        es_keyword10.citedNum=1523;
+
+        List<ES_Keyword> row = new ArrayList<>();
+        row.add(es_keyword);
+        row.add(es_keyword2);
+        row.add(es_keyword3);
+        row.add(es_keyword4);
+        row.add(es_keyword5);
+        row.add(es_keyword6);
+        row.add(es_keyword7);
+        row.add(es_keyword8);
+        row.add(es_keyword9);
+        row.add(es_keyword10);
 //        Map<String,Integer> map=new HashMap<>();
 //        for(int i=0;i<10;i++){
 //            int l=es_documentList.get(i).getKeywordList().size();
