@@ -202,7 +202,7 @@ public class ES_Document {
         this.cited_quantity = cited_quantity;
         this.time = time;
         this.dtype = dtype;
-        String[] authorNames = experts.split("[,，\\s;.。、]+");
+        String[] authorNames = experts.split("[,，\\s;；.。、；]+");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
 
@@ -229,7 +229,7 @@ public class ES_Document {
 //                this.authors.add(es_expert);
 //            }
         }
-        String[] keyword = keywords.split("[,，\\s;.。、]+");
+        String[] keyword = keywords.split("[,，\\s;；.。、；]+");
         this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)
 //            this.time = null;

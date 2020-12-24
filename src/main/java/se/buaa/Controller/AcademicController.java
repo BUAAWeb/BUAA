@@ -411,25 +411,25 @@ public class AcademicController {
 
         if(year != null ){
             if(!"".equals(year)) {
-                try {
-                    Integer.parseInt(year);
-                }
-                catch (Exception e) {
-                    return CodeEnum.yearNotInteger;
-                }
+//                try {
+//                    Integer.parseInt(year);
+//                }
+//                catch (Exception e) {
+//                    return CodeEnum.yearNotInteger;
+//                }
                 searchWords.setStartTime(filterWords.getYear());
             }
         }
         else if(searchWords.getStartTime() == null || searchWords.getStartTime().equals(""))
             searchWords.setStartTime("0");
 
-        try {
-            Integer.parseInt(searchWords.getStartTime());
-            Integer.parseInt(searchWords.getEndTime());
-        }
-        catch (Exception e) {
-            return CodeEnum.yearNotInteger;
-        }
+//        try {
+//            Integer.parseInt(searchWords.getStartTime());
+//            Integer.parseInt(searchWords.getEndTime());
+//        }
+//        catch (Exception e) {
+//            return CodeEnum.yearNotInteger;
+//        }
 
         return  CodeEnum.success;
     }
@@ -563,7 +563,10 @@ public class AcademicController {
         if(year == null || year.length() < 4)
             year = simpleDateFormat.format(new Date()).substring(0,4);
         year = year.substring(0,4);
-        String startYear = searchWords.getStartTime();
+        int l=searchWords.getStartTime().length();
+        if(l>4)
+            l=4;
+        String startYear = searchWords.getStartTime().substring(0,l);
         int start = Integer.parseInt(startYear);
 
         int[] years = new int[5];
