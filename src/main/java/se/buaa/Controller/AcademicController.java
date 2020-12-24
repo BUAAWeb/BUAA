@@ -14,6 +14,7 @@ package se.buaa.Controller;
 //500 （internal server error）- 通用错误响应
 //503 （Service Unavailable）- 服务当前无法处理请求
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.BeanUtils;
@@ -139,7 +140,7 @@ public class AcademicController {
     public Result<Data> getExpert(String expertName,int pageNumber) {
         Date date1 = new Date();
         Sort.Order order = Sort.Order.desc("time");
-        System.out.println(expertName);
+//        System.out.println(expertName);
         List<Sort.Order> orderList = new ArrayList<>();
         orderList.add(order);
         Sort sort = Sort.by(orderList);
@@ -179,43 +180,52 @@ public class AcademicController {
         String endYear = searchWords.getEndTime();
         String experts = searchWords.getExperts();
         String origin = searchWords.getOrigin();
-
+        int i=0;
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-        System.out.println(searchWords.toString());
+//        System.out.println(searchWords.toString());
         if(searchWords1 != null&& !searchWords1.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",searchWords1).slop(0);
+                QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",title).slop(0);
+                boolQueryBuilder.must(queryBuilder);
+//                MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(searchWords1,"title","experts","keywords");
+////            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*"+searchWords1+ "*" ,
+////                    "title","keyword.keyword"//"*" + keywords + "*",
+////                    );
+//
+//                boolQueryBuilder.must(multiMatchQueryBuilder);
 
-//            QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery( "*"+searchWords1+ "*" ,
-//                    "title","keyword.keyword"//"*" + keywords + "*",
-//                    );
-            boolQueryBuilder.must(queryBuilder);
         }
         if(title != null&& !title.equals("")){
             QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("title",title).slop(0);
             boolQueryBuilder.must(queryBuilder);
+            i++;
         }
         if(keywords != null&& !keywords.equals("")){
-            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("keyword",keywords).slop(0);            boolQueryBuilder.must(queryBuilder);
+            QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("keywords",keywords).slop(0);
+            boolQueryBuilder.must(queryBuilder);
+            i++;
         }
         if(startYear != null && endYear != null){
             QueryBuilder queryBuilder = QueryBuilders.rangeQuery("time").from(startYear).to(endYear)
                     .includeUpper(true).includeLower(true);
             boolQueryBuilder.must(queryBuilder);
+            i++;
         }
         if(experts != null&& !experts.equals("")){
-
-            experts  = experts.replaceAll("[,，\\s;.。]+","*");
-
+//            experts  = experts.replaceAll("[,，\\s;.。]+","*");
+            experts="*,"+experts+",*";
             QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("experts",experts).slop(0);
             boolQueryBuilder.must(queryBuilder);
+
         }
         if(origin != null&& !origin.equals("")){
             QueryBuilder queryBuilder = QueryBuilders.matchPhrasePrefixQuery("origin",origin).slop(0);
             boolQueryBuilder.must(queryBuilder);
+            i++;
         }
         if(typeList.size() == 1){
             QueryBuilder queryBuilder = QueryBuilders.matchQuery("dtype", typeList.get(0));
             boolQueryBuilder.must(queryBuilder);
+            i++;
         }
 
         Sort sort1 = getSort(sort);
@@ -223,11 +233,11 @@ public class AcademicController {
                 .withQuery(boolQueryBuilder)
                 .withPageable(PageRequest.of(pageNum - 1, pageSize,sort1))
                 .build();
-        System.out.println(searchQuery.toString());
+//        System.out.println(searchQuery.toString());
         Page<ES_Document> es_documents = es_documentDao.search(searchQuery);
         List<ES_Document> es_documentList = es_documents.toList();
         //如果只搜作者，添加返回作者列表
-        if((keywords==null||keywords=="")&&experts!=null&&experts!=""){// TODO: 2020-12-22 org
+        if(experts!=null&&experts!=""){// TODO: 2020-12-22 org
             List<String> expertList=new ArrayList<>();
             expertList.add(experts);
             PageRequest page = PageRequest.of(0, 6);
@@ -774,7 +784,7 @@ public class AcademicController {
     public Result<ES_Keyword> getHotKeywords(){
 
 
-        Sort sort1 = getSort("citedNum");
+        Sort sort1 = getSort("view");
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withPageable(PageRequest.of(0, pageSize,sort1))
                 .build();

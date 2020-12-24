@@ -202,29 +202,34 @@ public class ES_Document {
         this.cited_quantity = cited_quantity;
         this.time = time;
         this.dtype = dtype;
-        String[] authorNames = experts.split("[,，\\s;.。]+");
+        String[] authorNames = experts.split("[,，\\s;.。、]+");
         this.authors = new ArrayList<>();
         for(String author : authorNames){
+
             if(!Pattern.matches("\\s*",author)) {
-                ES_Expert es_expert;
-                Document_Expert document_expert = AcademicController.academicController.getDocu_expertRepository().
-                        findByDocumentIDAndExpertName(documentid, author);
-                if(document_expert != null) {
-                    es_expert = AcademicController.academicController.getEs_expertDao().
-                            findByExpertid(document_expert.getExpertID());
-                    if (es_expert == null) {
-                        es_expert = new ES_Expert();
-                        es_expert.setName(author);
-                    }
-                }
-                else {
-                    es_expert = new ES_Expert();
-                    es_expert.setName(author);
-                }
+                ES_Expert es_expert=new ES_Expert();
+                es_expert.setName(author);
                 this.authors.add(es_expert);
             }
+//                ES_Expert es_expert;
+//                Document_Expert document_expert = AcademicController.academicController.getDocu_expertRepository().
+//                        findByDocumentIDAndExpertName(documentid, author);
+//                if(document_expert != null) {
+//                    es_expert = AcademicController.academicController.getEs_expertDao().
+//                            findByExpertid(document_expert.getExpertID());
+//                    if (es_expert == null) {
+//                        es_expert = new ES_Expert();
+//                        es_expert.setName(author);
+//                    }
+//                }
+//                else {
+//                    es_expert = new ES_Expert();
+//                    es_expert.setName(author);
+//                }
+//                this.authors.add(es_expert);
+//            }
         }
-        String[] keyword = keywords.split("[,，\\s;.。]+");
+        String[] keyword = keywords.split("[,，\\s;.。、]+");
         this.keywordList.addAll(Arrays.asList(keyword));
 //        if(time == null)
 //            this.time = null;
