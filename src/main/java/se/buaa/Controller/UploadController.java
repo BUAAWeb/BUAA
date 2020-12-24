@@ -32,12 +32,15 @@ public class UploadController {
             return Result.Error("201","图片上传错误");
         }
     }
-    @RequestMapping("/getImg")
+    @RequestMapping(value = "/getImg",produces = "image/jpeg")
     @ResponseBody
-    public getImgRes getImg(@RequestParam int imgID) {
+    public byte[] getImg(@RequestParam int imgID) {
         getImgRes data = new getImgRes();
         data.img = blobRepository.findBlob2ByImgID(imgID).data;
-        return data;
+        return data.img;
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.IMAGE_JPEG)
+//                .body(data.img);
     }
 
     public class getImgRes{
